@@ -175,6 +175,5 @@ create policy "Users update own logo"
   using (bucket_id = 'logos' and auth.uid()::text = (storage.foldername(name))[1]);
 
 drop policy if exists "Public read logos" on storage.objects;
-create policy "Public read logos"
-  on storage.objects for select
-  using (bucket_id = 'logos');
+-- Public bucket serves files via public URL without a SELECT policy.
+-- Omitting the SELECT policy prevents clients from listing all objects in the bucket.

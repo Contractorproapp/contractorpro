@@ -40,8 +40,8 @@ export default function Sidebar() {
   const close = () => setMobileOpen(false)
 
   const handleSignOut = async () => {
-    await signOut()
-    navigate('/login')
+    try { await signOut() } catch {}
+    window.location.href = '/login'
   }
 
   const sidebarContent = (
