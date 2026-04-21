@@ -1,0 +1,84 @@
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { AuthProvider } from './contexts/AuthContext'
+import ProtectedRoute from './components/ProtectedRoute'
+import Sidebar from './components/Sidebar'
+
+import Login               from './pages/Login'
+import Signup              from './pages/Signup'
+import Onboarding          from './pages/Onboarding'
+import Paywall             from './pages/Paywall'
+import SubscriptionSuccess from './pages/SubscriptionSuccess'
+import Estimates           from './pages/Estimates'
+import Leads               from './pages/Leads'
+import Invoices            from './pages/Invoices'
+import Projects            from './pages/Projects'
+import Marketing           from './pages/Marketing'
+import Profile             from './pages/Profile'
+import PublicInvoice       from './pages/PublicInvoice'
+import PublicProject       from './pages/PublicProject'
+
+function AppShell({ children }) {
+  return (
+    <div className="flex min-h-screen">
+      <Sidebar />
+      <main className="flex-1 p-4 lg:p-8 overflow-y-auto">
+        {children}
+      </main>
+    </div>
+  )
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          {/* Public auth routes */}
+          <Route path="/login"    element={<Login />} />
+          <Route path="/signup"   element={<Signup />} />
+
+          {/* Post-signup flow (auth required, sub not required) */}
+          <Route path="/onboarding"         element={<Onboarding />} />
+          <Route path="/subscribe"          element={<Paywall />} />
+          <Route path="/subscribe/success"  element={<SubscriptionSuccess />} />
+
+          {/* Public shareable pages — no login needed */}
+          <Route path="/invoice/:token" element={<PublicInvoice />} />
+          <Route path="/project/:token" element={<PublicProject />} />
+
+          {/* Protected app routes */}
+          <Route path="/" element={
+            <ProtectedRoute>
+              <AppShell><Estimates /></AppShell>
+            </ProtectedRoute>
+          } />
+          <Route path="/leads" element={
+            <ProtectedRoute>
+              <AppShell><Leads /></AppShell>
+            </ProtectedRoute>
+          } />
+          <Route path="/invoices" element={
+            <ProtectedRoute>
+              <AppShell><Invoices /></AppShell>
+            </ProtectedRoute>
+          } />
+          <Route path="/projects" element={
+            <ProtectedRoute>
+              <AppShell><Projects /></AppShell>
+            </ProtectedRoute>
+          } />
+          <Route path="/marketing" element={
+            <ProtectedRoute>
+              <AppShell><Marketing /></AppShell>
+            </ProtectedRoute>
+          } />
+          <Route path="/profile" element={
+            <ProtectedRoute>
+              <AppShell><Profile /></AppShell>
+            </ProtectedRoute>
+          } />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
+  )
+}
