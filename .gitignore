@@ -7,3 +7,4 @@ dist
 .kiro/
 .qwen/
 .windsurf/
+supabase/.temp/
