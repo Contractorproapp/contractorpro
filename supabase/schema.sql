@@ -1,9 +1,7 @@
 -- ============================================================
--- ContractorPro — Supabase Schema
--- Run this entire file in your Supabase SQL Editor
+-- ContractorPro — Supabase Schema (idempotent — safe to re-run)
 -- ============================================================
 
--- Enable pgcrypto for gen_random_bytes
 create extension if not exists pgcrypto;
 
 -- ─────────────────────────────────────────────
@@ -24,18 +22,26 @@ create table if not exists profiles (
 );
 
 alter table profiles enable row level security;
+drop policy if exists "Users manage own profile" on profiles;
 create policy "Users manage own profile"
   on profiles for all using (auth.uid() = id);
 
--- Auto-create profile on sign-up
-create or replace function handle_new_user()
-returns trigger language plpgsql security definer as $$
+create or replace function public.handle_new_user()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
 begin
-  insert into profiles (id, email)
-  values (new.id, new.email);
+  insert into public.profiles (id, email)
+  values (new.id, new.email)
+  on conflict (id) do nothing;
   return new;
 end;
 $$;
+
+grant usage on schema public to supabase_auth_admin;
+grant all on public.profiles to supabase_auth_admin;
 
 drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
@@ -65,6 +71,7 @@ create table if not exists estimates (
 );
 
 alter table estimates enable row level security;
+drop policy if exists "Users manage own estimates" on estimates;
 create policy "Users manage own estimates"
   on estimates for all using (auth.uid() = user_id);
 
@@ -85,6 +92,7 @@ create table if not exists leads (
 );
 
 alter table leads enable row level security;
+drop policy if exists "Users manage own leads" on leads;
 create policy "Users manage own leads"
   on leads for all using (auth.uid() = user_id);
 
@@ -113,10 +121,11 @@ create table if not exists invoices (
 );
 
 alter table invoices enable row level security;
+drop policy if exists "Users manage own invoices" on invoices;
 create policy "Users manage own invoices"
   on invoices for all using (auth.uid() = user_id);
 
--- Public read via token (for shareable links)
+drop policy if exists "Public read invoices by token" on invoices;
 create policy "Public read invoices by token"
   on invoices for select using (public_token is not null);
 
@@ -140,10 +149,11 @@ create table if not exists projects (
 );
 
 alter table projects enable row level security;
+drop policy if exists "Users manage own projects" on projects;
 create policy "Users manage own projects"
   on projects for all using (auth.uid() = user_id);
 
--- Public read via token
+drop policy if exists "Public read projects by token" on projects;
 create policy "Public read projects by token"
   on projects for select using (public_token is not null);
 
@@ -154,14 +164,17 @@ insert into storage.buckets (id, name, public)
   values ('logos', 'logos', true)
   on conflict do nothing;
 
+drop policy if exists "Users upload own logo" on storage.objects;
 create policy "Users upload own logo"
   on storage.objects for insert
   with check (bucket_id = 'logos' and auth.uid()::text = (storage.foldername(name))[1]);
 
+drop policy if exists "Users update own logo" on storage.objects;
 create policy "Users update own logo"
   on storage.objects for update
   using (bucket_id = 'logos' and auth.uid()::text = (storage.foldername(name))[1]);
 
+drop policy if exists "Public read logos" on storage.objects;
 create policy "Public read logos"
   on storage.objects for select
   using (bucket_id = 'logos');
