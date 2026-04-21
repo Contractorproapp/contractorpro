@@ -45,15 +45,13 @@ export default function Marketing() {
   const setField = (key, val) => setFieldValues(fv => ({ ...fv, [key]:val }))
 
   const generate = () => {
-    const apiKey = profile?.claude_api_key
-    if (!apiKey) { setError('No API key — add yours in Profile & Settings.'); return }
+    if (!profile?.claude_api_key) { setError('No API key — add yours in Profile & Settings.'); return }
     setOutput(''); setError(''); setLoading(true)
 
     const fieldsSummary = activeType.fields.map(f => `${f.label}: ${fieldValues[f.key] || 'not provided'}`).join('\n')
     const businessName  = profile?.business_name || 'the contractor'
 
     streamClaude({
-      apiKey,
       system: SYSTEM,
       prompt: `Write ${activeType.label} content for ${businessName}.\n\n${fieldsSummary}\n\nContent type: ${activeType.label}`,
       onChunk: (_, full) => setOutput(full),

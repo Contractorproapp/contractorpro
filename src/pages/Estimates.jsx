@@ -106,8 +106,7 @@ export default function Estimates() {
 
   const generate = () => {
     setOutput(''); setError(''); setLoading(true)
-    const apiKey = profile?.claude_api_key
-    if (!apiKey) { setError('No API key — add yours in Profile & Settings.'); setLoading(false); return }
+    if (!profile?.claude_api_key) { setError('No API key — add yours in Profile & Settings.'); setLoading(false); return }
 
     const itemsText = lineItems.filter(i => i.desc).map(i => `- ${i.desc}: qty ${i.qty} × $${i.unit}`).join('\n')
     const prompt = `Generate a professional contractor estimate for:
@@ -121,7 +120,6 @@ Line Items:\n${itemsText || '(No line items)'}
 Subtotal: $${subtotal.toFixed(2)} | Total with markup: $${total.toFixed(2)}`
 
     streamClaude({
-      apiKey,
       system: SYSTEM,
       prompt,
       onChunk: (_, full) => setOutput(full),

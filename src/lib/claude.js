@@ -1,41 +1,37 @@
-export async function streamClaude({ apiKey, prompt, system, onChunk, onDone, onError }) {
-  if (!apiKey) {
-    onError?.('No Claude API key. Add yours in Profile & Settings.')
-    return
-  }
+import { supabase } from './supabase'
 
+export async function streamClaude({ prompt, system, onChunk, onDone, onError }) {
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session) {
+      onError?.('Not signed in')
+      return
+    }
+
+    const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/claude-proxy`
+    const res = await fetch(url, {
       method: 'POST',
       headers: {
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-beta': 'prompt-caching-2024-07-31',
-        'content-type': 'application/json',
+        Authorization: `Bearer ${session.access_token}`,
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 2048,
-        stream: true,
-        system: [{ type:'text', text:system, cache_control:{ type:'ephemeral' } }],
-        messages: [{ role:'user', content:prompt }],
-      }),
+      body: JSON.stringify({ prompt, system }),
     })
 
     if (!res.ok) {
       const err = await res.json().catch(() => ({}))
-      onError?.(err?.error?.message || `API error ${res.status}`)
+      onError?.(err?.error || `API error ${res.status}`)
       return
     }
 
-    const reader  = res.body.getReader()
+    const reader = res.body.getReader()
     const decoder = new TextDecoder()
     let buffer = '', full = ''
 
     while (true) {
       const { done, value } = await reader.read()
       if (done) break
-      buffer += decoder.decode(value, { stream:true })
+      buffer += decoder.decode(value, { stream: true })
       const lines = buffer.split('\n')
       buffer = lines.pop()
       for (const line of lines) {

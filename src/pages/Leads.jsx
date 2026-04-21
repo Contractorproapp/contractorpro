@@ -49,8 +49,7 @@ export default function Leads() {
 
   const generateFollowUp = (lead) => {
     setSelected(lead); setOutput(''); setError(''); setLoading(true)
-    const apiKey = profile?.claude_api_key
-    if (!apiKey) { setError('No API key — add yours in Profile & Settings.'); setLoading(false); return }
+    if (!profile?.claude_api_key) { setError('No API key — add yours in Profile & Settings.'); setLoading(false); return }
 
     const prompt = `Write a follow-up ${followUpType} for a contractor to send to:
 Name: ${lead.name}
@@ -60,7 +59,6 @@ Notes: ${lead.notes || 'none'}
 Message type: ${followUpType}`
 
     streamClaude({
-      apiKey,
       system: SYSTEM,
       prompt,
       onChunk: (_, full) => setOutput(full),
