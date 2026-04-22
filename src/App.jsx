@@ -9,6 +9,7 @@ import Onboarding          from './pages/Onboarding'
 import Paywall             from './pages/Paywall'
 import SubscriptionSuccess from './pages/SubscriptionSuccess'
 import Estimates           from './pages/Estimates'
+import Dashboard           from './pages/Dashboard'
 import Leads               from './pages/Leads'
 import Invoices            from './pages/Invoices'
 import Projects            from './pages/Projects'
@@ -26,7 +27,7 @@ import { Navigate }        from 'react-router-dom'
 function Root() {
   const { user, loading } = useAuth()
   if (loading) return null
-  if (user) return <ProtectedRoute><AppShell><Estimates /></AppShell></ProtectedRoute>
+  if (user) return <ProtectedRoute><AppShell><Dashboard /></AppShell></ProtectedRoute>
   return <Landing />
 }
 
@@ -64,6 +65,11 @@ export default function App() {
 
           {/* Landing (public) or Dashboard (auth'd) */}
           <Route path="/" element={<Root />} />
+          <Route path="/estimates" element={
+            <ProtectedRoute>
+              <AppShell><Estimates /></AppShell>
+            </ProtectedRoute>
+          } />
           <Route path="/leads" element={
             <ProtectedRoute>
               <AppShell><Leads /></AppShell>

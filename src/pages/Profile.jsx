@@ -7,6 +7,7 @@ export default function Profile() {
   const { user, profile, refreshProfile } = useAuth()
   const [businessName, setBusinessName] = useState('')
   const [phone, setPhone]               = useState('')
+  const [reviewUrl, setReviewUrl]       = useState('')
   const [apiKey, setApiKey]             = useState('')
   const [showKey, setShowKey]           = useState(false)
   const [logoFile, setLogoFile]         = useState(null)
@@ -19,6 +20,7 @@ export default function Profile() {
     if (profile) {
       setBusinessName(profile.business_name || '')
       setPhone(profile.phone || '')
+      setReviewUrl(profile.google_review_url || '')
       setApiKey(profile.claude_api_key || '')
       setLogoPreview(profile.logo_url || null)
     }
@@ -49,6 +51,7 @@ export default function Profile() {
       id: user.id,
       business_name: businessName.trim(),
       phone: phone.trim(),
+      google_review_url: reviewUrl.trim(),
       claude_api_key: apiKey.trim(),
       ...(logoUrl && { logo_url: logoUrl }),
     })
@@ -104,6 +107,12 @@ export default function Profile() {
             <label className="label">Business Phone</label>
             <input className="input" placeholder="(555) 123-4567" value={phone} onChange={e => setPhone(e.target.value)} />
           </div>
+        </div>
+
+        <div>
+          <label className="label">Google Review Link (optional)</label>
+          <input className="input" placeholder="https://g.page/r/..." value={reviewUrl} onChange={e => setReviewUrl(e.target.value)} />
+          <p className="text-xs text-gray-400 mt-1">Used for the "Request Review" button on paid invoices. Get yours from your Google Business profile.</p>
         </div>
 
         <div>

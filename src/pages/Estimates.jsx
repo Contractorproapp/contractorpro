@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase'
 import { streamClaude } from '../lib/claude'
 import { useAuth } from '../contexts/AuthContext'
 import AiOutput from '../components/AiOutput'
+import VoiceButton from '../components/VoiceButton'
 
 const SYSTEM = `You are an expert contractor estimating assistant. You write clear, professional, itemized estimates for contractors (plumbers, electricians, roofers, HVAC, general contractors, etc.).
 
@@ -228,8 +229,11 @@ Subtotal: $${subtotal.toFixed(2)} | Total with markup: $${total.toFixed(2)}`
           </div>
 
           <div>
-            <label className="label">Additional Notes</label>
-            <textarea className="input h-20 resize-none" placeholder="Special conditions, access notes, customer requests…" value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} />
+            <div className="flex items-center justify-between mb-1">
+              <label className="label mb-0">Additional Notes</label>
+              <VoiceButton onTranscript={text => setForm(f => ({ ...f, notes: text }))} />
+            </div>
+            <textarea className="input h-20 resize-none" placeholder="Tap Dictate to speak. Describe the job, materials, access notes, customer requests…" value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} />
           </div>
 
           <div className="flex flex-wrap items-center justify-between gap-3 pt-1">

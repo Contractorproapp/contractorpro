@@ -2,16 +2,17 @@ import { useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import {
   FileText, Users, Receipt, FolderOpen, Megaphone,
-  User, Hammer, Menu, X, LogOut,
+  User, Hammer, Menu, X, LogOut, LayoutDashboard,
 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 
 const NAV = [
-  { to: '/',          icon: FileText,   label: 'Estimates' },
-  { to: '/leads',     icon: Users,      label: 'Leads'     },
-  { to: '/invoices',  icon: Receipt,    label: 'Invoices'  },
-  { to: '/projects',  icon: FolderOpen, label: 'Projects'  },
-  { to: '/marketing', icon: Megaphone,  label: 'Marketing' },
+  { to: '/',           icon: LayoutDashboard, label: 'Dashboard' },
+  { to: '/estimates',  icon: FileText,        label: 'Estimates' },
+  { to: '/leads',      icon: Users,           label: 'Leads'     },
+  { to: '/invoices',   icon: Receipt,         label: 'Invoices'  },
+  { to: '/projects',   icon: FolderOpen,      label: 'Projects'  },
+  { to: '/marketing',  icon: Megaphone,       label: 'Marketing' },
 ]
 
 function NavItem({ to, icon: Icon, label, onClick }) {

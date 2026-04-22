@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Plus, Trash2, Receipt, AlertCircle, CheckCircle2, Clock, Link, Mail, Loader2 } from 'lucide-react'
+import { Plus, Trash2, Receipt, AlertCircle, CheckCircle2, Clock, Link, Mail, Loader2, Star } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 
@@ -128,6 +128,13 @@ export default function Invoices() {
     setTimeout(() => setCopied(null), 2000)
   }
 
+  const requestReview = (inv) => {
+    const url = profile?.google_review_url
+    if (!url) { alert('Add your Google Review link in Profile & Settings first.'); return }
+    const msg = encodeURIComponent(`Hi ${inv.client_name || 'there'}, thanks so much for your business! If you were happy with the work, would you leave us a quick review? It really helps. ${url}\n\n— ${profile?.business_name || ''}`)
+    window.open(`sms:${inv.client_phone || ''}?&body=${msg}`)
+  }
+
   const emailInvoice = (inv) => {
     const link    = `${window.location.origin}/invoice/${inv.public_token}`
     const subject = encodeURIComponent(`Invoice from ${profile?.business_name || 'Your Contractor'} — ${inv.invoice_number}`)
@@ -187,6 +194,11 @@ export default function Invoices() {
                   <button onClick={() => emailInvoice(inv)} title="Email invoice" className="btn-ghost text-xs py-1 px-2">
                     <Mail size={14} /> Email
                   </button>
+                  {inv.status === 'Paid' && (
+                    <button onClick={() => requestReview(inv)} title="Request Google review" className="btn-ghost text-xs py-1 px-2 text-yellow-600">
+                      <Star size={14} /> Review
+                    </button>
+                  )}
                   <button onClick={() => copyLink(inv.public_token)} title="Copy share link" className="btn-ghost text-xs py-1 px-2">
                     <Link size={14} /> {copied === inv.public_token ? 'Copied!' : 'Share'}
                   </button>
