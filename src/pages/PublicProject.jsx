@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { Loader2, Hammer, FileText, AlertTriangle } from 'lucide-react'
+import { Loader2, Hammer, FileText, AlertTriangle, Download } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 
 const STATUS_COLORS = {
@@ -53,8 +53,13 @@ export default function PublicProject() {
   )
 
   return (
-    <div className="min-h-screen bg-gray-50 py-10 px-4">
+    <div className="min-h-screen bg-gray-50 py-10 px-4 print:bg-white print:py-0">
       <div className="max-w-2xl mx-auto space-y-5">
+        <div className="flex justify-end print:hidden">
+          <button onClick={() => window.print()} className="btn-secondary">
+            <Download size={15} /> Download PDF
+          </button>
+        </div>
         {/* Header */}
         <div className="card p-6 flex items-start justify-between gap-4">
           <div className="flex items-center gap-3">

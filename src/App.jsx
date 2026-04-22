@@ -18,6 +18,16 @@ import PublicInvoice       from './pages/PublicInvoice'
 import PublicProject       from './pages/PublicProject'
 import Privacy             from './pages/Privacy'
 import Terms               from './pages/Terms'
+import Landing             from './pages/Landing'
+import { useAuth }         from './contexts/AuthContext'
+import { Navigate }        from 'react-router-dom'
+
+function Root() {
+  const { user, loading } = useAuth()
+  if (loading) return null
+  if (user) return <ProtectedRoute><AppShell><Estimates /></AppShell></ProtectedRoute>
+  return <Landing />
+}
 
 function AppShell({ children }) {
   return (
@@ -50,12 +60,8 @@ export default function App() {
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms"   element={<Terms />} />
 
-          {/* Protected app routes */}
-          <Route path="/" element={
-            <ProtectedRoute>
-              <AppShell><Estimates /></AppShell>
-            </ProtectedRoute>
-          } />
+          {/* Landing (public) or Dashboard (auth'd) */}
+          <Route path="/" element={<Root />} />
           <Route path="/leads" element={
             <ProtectedRoute>
               <AppShell><Leads /></AppShell>
