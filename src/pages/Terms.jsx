@@ -71,7 +71,7 @@ export default function Terms() {
 
         <section>
           <h2 className="text-xl font-semibold mb-2">11. Contact</h2>
-          <p>Questions: <a href="mailto:nyokas444@gmail.com" className="text-brand-600 hover:underline">nyokas444@gmail.com</a></p>
+          <p>Questions: <a href="mailto:Contractorproapp@proton.me" className="text-brand-600 hover:underline">Contractorproapp@proton.me</a></p>
         </section>
       </div>
     </div>
