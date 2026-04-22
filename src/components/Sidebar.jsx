@@ -3,6 +3,7 @@ import { NavLink, useNavigate } from 'react-router-dom'
 import {
   FileText, Users, Receipt, FolderOpen, Megaphone,
   User, Hammer, Menu, X, LogOut, LayoutDashboard,
+  Contact, Calendar as CalendarIcon, Wallet,
 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 
@@ -10,8 +11,11 @@ const NAV = [
   { to: '/',           icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/estimates',  icon: FileText,        label: 'Estimates' },
   { to: '/leads',      icon: Users,           label: 'Leads'     },
+  { to: '/clients',    icon: Contact,         label: 'Clients'   },
   { to: '/invoices',   icon: Receipt,         label: 'Invoices'  },
   { to: '/projects',   icon: FolderOpen,      label: 'Projects'  },
+  { to: '/calendar',   icon: CalendarIcon,    label: 'Calendar'  },
+  { to: '/expenses',   icon: Wallet,          label: 'Expenses'  },
   { to: '/marketing',  icon: Megaphone,       label: 'Marketing' },
 ]
 
@@ -22,7 +26,7 @@ function NavItem({ to, icon: Icon, label, onClick }) {
       end={to === '/'}
       onClick={onClick}
       className={({ isActive }) =>
-        `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+        `flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
           isActive ? 'bg-brand-600 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white'
         }`
       }
@@ -77,7 +81,7 @@ export default function Sidebar() {
           to="/profile"
           onClick={close}
           className={({ isActive }) =>
-            `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+            `flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
               isActive ? 'bg-brand-600 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white'
             }`
           }

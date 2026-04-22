@@ -14,6 +14,9 @@ import Leads               from './pages/Leads'
 import Invoices            from './pages/Invoices'
 import Projects            from './pages/Projects'
 import Marketing           from './pages/Marketing'
+import Clients             from './pages/Clients'
+import Calendar            from './pages/Calendar'
+import Expenses            from './pages/Expenses'
 import Profile             from './pages/Profile'
 import PublicInvoice       from './pages/PublicInvoice'
 import PublicProject       from './pages/PublicProject'
@@ -88,6 +91,21 @@ export default function App() {
           <Route path="/marketing" element={
             <ProtectedRoute>
               <AppShell><Marketing /></AppShell>
+            </ProtectedRoute>
+          } />
+          <Route path="/clients" element={
+            <ProtectedRoute>
+              <AppShell><Clients /></AppShell>
+            </ProtectedRoute>
+          } />
+          <Route path="/calendar" element={
+            <ProtectedRoute>
+              <AppShell><Calendar /></AppShell>
+            </ProtectedRoute>
+          } />
+          <Route path="/expenses" element={
+            <ProtectedRoute>
+              <AppShell><Expenses /></AppShell>
             </ProtectedRoute>
           } />
           <Route path="/profile" element={
