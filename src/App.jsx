@@ -16,6 +16,7 @@ import Marketing           from './pages/Marketing'
 import Profile             from './pages/Profile'
 import PublicInvoice       from './pages/PublicInvoice'
 import PublicProject       from './pages/PublicProject'
+import PublicEstimate      from './pages/PublicEstimate'
 import Privacy             from './pages/Privacy'
 import Terms               from './pages/Terms'
 import Landing             from './pages/Landing'
@@ -55,8 +56,9 @@ export default function App() {
           <Route path="/subscribe/success"  element={<SubscriptionSuccess />} />
 
           {/* Public shareable pages — no login needed */}
-          <Route path="/invoice/:token" element={<PublicInvoice />} />
-          <Route path="/project/:token" element={<PublicProject />} />
+          <Route path="/invoice/:token"  element={<PublicInvoice />} />
+          <Route path="/project/:token"  element={<PublicProject />} />
+          <Route path="/estimate/:token" element={<PublicEstimate />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms"   element={<Terms />} />
 

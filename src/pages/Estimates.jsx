@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Plus, Trash2, ChevronDown, ChevronUp, FileText, Sparkles, Loader2 } from 'lucide-react'
+import { Plus, Trash2, ChevronDown, ChevronUp, FileText, Sparkles, Loader2, Link as LinkIcon, CheckCircle2 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { streamClaude } from '../lib/claude'
 import { useAuth } from '../contexts/AuthContext'
@@ -40,11 +40,18 @@ function LineItem({ item, onChange, onRemove }) {
 function EstimateCard({ est, onDelete }) {
   const [open, setOpen] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [copied, setCopied] = useState(false)
   const statusColors = { Draft:'bg-gray-100 text-gray-600', Sent:'bg-blue-100 text-blue-700', Accepted:'bg-green-100 text-green-700', Declined:'bg-red-100 text-red-700' }
 
   const handleDelete = async () => {
     setDeleting(true)
     await onDelete(est.id)
+  }
+
+  const copyLink = () => {
+    navigator.clipboard.writeText(`${window.location.origin}/estimate/${est.public_token}`)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
   }
 
   return (
@@ -58,6 +65,7 @@ function EstimateCard({ est, onDelete }) {
           </div>
         </div>
         <div className="flex items-center gap-3">
+          {est.signed_at && <span className="badge bg-green-100 text-green-700"><CheckCircle2 size={12} /> Signed</span>}
           <span className={`badge ${statusColors[est.status] || statusColors.Draft}`}>{est.status}</span>
           <span className="font-bold text-brand-600">${(est.total || 0).toFixed(2)}</span>
           {open ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
@@ -68,9 +76,16 @@ function EstimateCard({ est, onDelete }) {
           {est.output && (
             <pre className="whitespace-pre-wrap text-xs text-gray-700 font-sans leading-relaxed bg-gray-50 p-3 rounded-lg max-h-72 overflow-y-auto">{est.output}</pre>
           )}
-          <button onClick={handleDelete} disabled={deleting} className="btn-ghost text-red-500 text-xs py-1 px-2">
-            <Trash2 size={13} /> {deleting ? 'Deleting…' : 'Delete'}
-          </button>
+          <div className="flex gap-2">
+            {est.public_token && (
+              <button onClick={copyLink} className="btn-ghost text-xs py-1 px-2">
+                <LinkIcon size={13} /> {copied ? 'Copied!' : 'Share for Signature'}
+              </button>
+            )}
+            <button onClick={handleDelete} disabled={deleting} className="btn-ghost text-red-500 text-xs py-1 px-2">
+              <Trash2 size={13} /> {deleting ? 'Deleting…' : 'Delete'}
+            </button>
+          </div>
         </div>
       )}
     </div>

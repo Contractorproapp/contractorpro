@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { Loader2, Hammer, Download } from 'lucide-react'
+import { Loader2, Hammer, Download, CreditCard } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 
 export default function PublicInvoice() {
@@ -52,7 +52,12 @@ export default function PublicInvoice() {
   return (
     <div className="min-h-screen bg-gray-50 py-10 px-4 print:bg-white print:py-0">
       <div className="max-w-2xl mx-auto space-y-6">
-        <div className="flex justify-end print:hidden">
+        <div className="flex justify-between items-center gap-2 print:hidden">
+          {invoice.payment_link && invoice.status !== 'Paid' ? (
+            <a href={invoice.payment_link} target="_blank" rel="noreferrer" className="btn-primary">
+              <CreditCard size={15} /> Pay ${(invoice.total||0).toFixed(2)}
+            </a>
+          ) : <div />}
           <button onClick={() => window.print()} className="btn-secondary">
             <Download size={15} /> Download PDF
           </button>

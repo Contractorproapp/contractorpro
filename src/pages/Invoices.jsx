@@ -12,7 +12,7 @@ function InvoiceForm({ userId, onSave, onCancel }) {
     client_name:'', client_phone:'', client_email:'', job_title:'',
     invoice_number:`INV-${Date.now().toString().slice(-5)}`,
     issue_date: new Date().toISOString().slice(0,10),
-    due_date:'', notes:'', status:'Draft',
+    due_date:'', notes:'', status:'Draft', payment_link:'',
   })
   const [lineItems, setLineItems] = useState([{ id:uid(), desc:'', qty:'1', unit:'' }])
   const [taxRate, setTaxRate] = useState('0')
@@ -83,6 +83,7 @@ function InvoiceForm({ userId, onSave, onCancel }) {
         </div>
       </div>
 
+      <div><label className="label">Payment Link (optional)</label><input className="input" placeholder="Paste your Stripe Payment Link, Venmo, Zelle, or CashApp URL" value={form.payment_link} onChange={e => setForm(f => ({ ...f, payment_link:e.target.value }))} /><p className="text-xs text-gray-400 mt-1">Clients will see a "Pay Now" button on the shared invoice link.</p></div>
       <div><label className="label">Notes / Payment Instructions</label><textarea className="input h-16 resize-none" placeholder="e.g. Pay via check or Venmo @contractor. Net 30." value={form.notes} onChange={e => setForm(f => ({ ...f, notes:e.target.value }))} /></div>
 
       <div className="flex justify-between items-center">

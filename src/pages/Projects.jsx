@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Plus, FolderOpen, FileText, AlertTriangle, Trash2, ChevronDown, ChevronUp, Link, Loader2 } from 'lucide-react'
+import { Plus, FolderOpen, FileText, AlertTriangle, Trash2, ChevronDown, ChevronUp, Link, Loader2, Camera, X } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 
@@ -60,6 +60,27 @@ export default function Projects() {
     await supabase.from('projects').update({ change_orders }).eq('id', id)
     setProjects(prev => prev.map(p => p.id===id ? { ...p, change_orders } : p))
     setChangeOrderInputs(co => ({ ...co, [id]:'' }))
+  }
+
+  const uploadPhoto = async (projId, file) => {
+    if (!file) return
+    const ext  = file.name.split('.').pop()
+    const path = `${user.id}/${projId}-${Date.now()}.${ext}`
+    const { error: upErr } = await supabase.storage.from('project-photos').upload(path, file, { upsert: false })
+    if (upErr) return
+    const { data: pub } = supabase.storage.from('project-photos').getPublicUrl(path)
+    const proj   = projects.find(p => p.id===projId)
+    const photos = [...(proj.photos||[]), { url: pub.publicUrl, path, uploaded_at: new Date().toISOString() }]
+    await supabase.from('projects').update({ photos }).eq('id', projId)
+    setProjects(prev => prev.map(p => p.id===projId ? { ...p, photos } : p))
+  }
+
+  const removePhoto = async (projId, photo) => {
+    await supabase.storage.from('project-photos').remove([photo.path])
+    const proj   = projects.find(p => p.id===projId)
+    const photos = (proj.photos||[]).filter(p => p.url !== photo.url)
+    await supabase.from('projects').update({ photos }).eq('id', projId)
+    setProjects(prev => prev.map(p => p.id===projId ? { ...p, photos } : p))
   }
 
   const toggleCOStatus = async (pid, coid) => {
@@ -160,6 +181,34 @@ export default function Projects() {
                       <div key={note.id} className="bg-gray-50 rounded-lg px-3 py-2">
                         <p className="text-sm text-gray-700">{note.text}</p>
                         <p className="text-xs text-gray-400 mt-0.5">{note.date}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Photos */}
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Camera size={14} className="text-gray-400" />
+                    <span className="text-sm font-semibold text-gray-700">Job Photos</span>
+                    <span className="badge bg-gray-100 text-gray-500">{(proj.photos||[]).length}</span>
+                  </div>
+                  <label className="btn-ghost text-xs py-1.5 cursor-pointer inline-flex mb-2">
+                    <Camera size={13} /> Add Photo
+                    <input type="file" accept="image/*" className="hidden"
+                      onChange={e => { uploadPhoto(proj.id, e.target.files?.[0]); e.target.value='' }} />
+                  </label>
+                  {(proj.photos||[]).length === 0 && <p className="text-xs text-gray-400 italic">No photos yet</p>}
+                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                    {(proj.photos||[]).map(photo => (
+                      <div key={photo.url} className="relative group aspect-square rounded-lg overflow-hidden bg-gray-100">
+                        <a href={photo.url} target="_blank" rel="noreferrer">
+                          <img src={photo.url} alt="" className="w-full h-full object-cover" />
+                        </a>
+                        <button onClick={() => removePhoto(proj.id, photo)}
+                          className="absolute top-1 right-1 w-6 h-6 bg-black/60 hover:bg-red-600 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                          <X size={12} />
+                        </button>
                       </div>
                     ))}
                   </div>

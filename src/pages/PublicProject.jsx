@@ -84,6 +84,20 @@ export default function PublicProject() {
           {project.description && <p className="text-sm text-gray-700 mt-2 pt-2 border-t border-gray-100">{project.description}</p>}
         </div>
 
+        {/* Photos */}
+        {(project.photos||[]).length > 0 && (
+          <div className="card p-6">
+            <h3 className="font-semibold text-gray-700 mb-3">Job Photos</h3>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {(project.photos||[]).map(photo => (
+                <a key={photo.url} href={photo.url} target="_blank" rel="noreferrer" className="aspect-square rounded-lg overflow-hidden bg-gray-100">
+                  <img src={photo.url} alt="" className="w-full h-full object-cover hover:opacity-90 transition-opacity" />
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Field Notes */}
         {(project.notes||[]).length > 0 && (
           <div className="card p-6">
