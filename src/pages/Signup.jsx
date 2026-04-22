@@ -90,7 +90,7 @@ export default function Signup() {
             </button>
           </form>
 
-          <p className="text-xs text-gray-400 text-center">By signing up you agree to our Terms of Service. $29/month after your free trial.</p>
+          <p className="text-xs text-gray-400 text-center">By signing up you agree to our <Link to="/terms" className="underline hover:text-gray-600">Terms</Link> and <Link to="/privacy" className="underline hover:text-gray-600">Privacy Policy</Link>. $29/month after your free trial.</p>
         </div>
 
         <p className="text-center text-sm text-gray-500">

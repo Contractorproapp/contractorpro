@@ -16,6 +16,8 @@ import Marketing           from './pages/Marketing'
 import Profile             from './pages/Profile'
 import PublicInvoice       from './pages/PublicInvoice'
 import PublicProject       from './pages/PublicProject'
+import Privacy             from './pages/Privacy'
+import Terms               from './pages/Terms'
 
 function AppShell({ children }) {
   return (
@@ -45,6 +47,8 @@ export default function App() {
           {/* Public shareable pages — no login needed */}
           <Route path="/invoice/:token" element={<PublicInvoice />} />
           <Route path="/project/:token" element={<PublicProject />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms"   element={<Terms />} />
 
           {/* Protected app routes */}
           <Route path="/" element={
