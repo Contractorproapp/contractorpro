@@ -178,8 +178,8 @@ export default function Calendar() {
             const items = projectsOnDay(day)
             const isToday = sameDay(day, today)
             return (
-              <button key={day.toISOString()} onClick={() => items.length > 0 && setDayDetail(day)}
-                className={`card p-3 min-h-[160px] text-left transition-shadow ${isToday ? 'ring-2 ring-brand-500' : ''} ${items.length > 0 ? 'hover:shadow-md cursor-pointer' : 'cursor-default'}`}
+              <button key={day.toISOString()} onClick={() => setDayDetail(day)}
+                className={`card p-3 min-h-[160px] text-left transition-shadow hover:shadow-md cursor-pointer ${isToday ? 'ring-2 ring-brand-500' : ''}`}
                 aria-label={`${day.toLocaleDateString()} — ${items.length} projects`}>
                 <div className="text-xs text-gray-500 uppercase tracking-wide">
                   {day.toLocaleDateString(undefined, { weekday: 'short' })}
@@ -214,8 +214,8 @@ export default function Calendar() {
               const inMonth = sameMonth(day, monthStart)
               const isToday = sameDay(day, today)
               return (
-                <button key={day.toISOString()} onClick={() => items.length > 0 && setDayDetail(day)}
-                  className={`min-h-[100px] border-r border-b p-1.5 text-left transition-colors ${!inMonth ? 'bg-gray-50/50' : 'bg-white'} ${items.length > 0 ? 'hover:bg-brand-50 cursor-pointer' : 'cursor-default'} ${(idx + 1) % 7 === 0 ? 'border-r-0' : ''}`}
+                <button key={day.toISOString()} onClick={() => setDayDetail(day)}
+                  className={`min-h-[100px] border-r border-b p-1.5 text-left transition-colors cursor-pointer hover:bg-brand-50 ${!inMonth ? 'bg-gray-50/50' : 'bg-white'} ${(idx + 1) % 7 === 0 ? 'border-r-0' : ''}`}
                   aria-label={`${day.toLocaleDateString()} — ${items.length} projects`}>
                   <div className={`text-xs font-medium mb-1 inline-flex items-center justify-center ${isToday ? 'bg-brand-600 text-white rounded-full w-5 h-5' : inMonth ? 'text-gray-700' : 'text-gray-300'}`}>
                     {day.getDate()}
@@ -256,6 +256,13 @@ export default function Calendar() {
               <button onClick={() => setDayDetail(null)} className="text-gray-400 hover:text-gray-600" aria-label="Close"><X size={20} /></button>
             </div>
             <div className="p-5 space-y-2">
+              {projectsOnDay(dayDetail).length === 0 && (
+                <div className="text-center py-6 text-gray-400">
+                  <CalIcon size={32} className="mx-auto mb-2 opacity-40" />
+                  <p className="text-sm mb-3">Nothing scheduled.</p>
+                  <Link to="/projects" className="btn-primary text-sm inline-flex"><CalIcon size={14} /> Schedule a project</Link>
+                </div>
+              )}
               {projectsOnDay(dayDetail).map(p => {
                 const start = parseDate(p.start_date)
                 const end = parseDate(p.end_date)
