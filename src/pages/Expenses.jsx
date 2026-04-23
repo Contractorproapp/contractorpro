@@ -1,15 +1,16 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { Plus, Trash2, Download, Upload, Car, Receipt as ReceiptIcon, Loader2, X, Info } from 'lucide-react'
+import { Plus, Trash2, Download, Upload, Car, Receipt as ReceiptIcon, Loader2, X, Info, FileText } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { useToast } from '../components/Toast'
+import { TaxReportPDF, downloadPdf } from '../lib/pdf'
 
 const CATEGORIES = ['Materials', 'Tools', 'Fuel', 'Subcontractor', 'Permits', 'Insurance', 'Vehicle', 'Office', 'Other']
 const IRS_MILEAGE_RATE = 0.67
 
 export default function Expenses() {
-  const { user } = useAuth()
+  const { user, profile } = useAuth()
   const toast = useToast()
   const [tab, setTab] = useState('expenses')
   const [expenses, setExpenses] = useState([])
@@ -146,6 +147,7 @@ export default function Expenses() {
             {Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - i).map(y => <option key={y}>{y}</option>)}
           </select>
           <button onClick={downloadCSV} className="btn-secondary text-sm"><Download size={14} /> CSV</button>
+          <button onClick={() => downloadPdf(<TaxReportPDF year={year} profile={profile} expenses={yearExpenses} mileage={yearMileage} mileageRate={IRS_MILEAGE_RATE} />, `${profile?.business_name || 'ContractorPro'}-${year}-Tax-Report.pdf`)} className="btn-secondary text-sm"><FileText size={14} /> Tax PDF</button>
         </div>
       </div>
 

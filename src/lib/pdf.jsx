@@ -198,6 +198,125 @@ export function InvoicePDF({ invoice, profile }) {
   )
 }
 
+export function TaxReportPDF({ year, profile, expenses, mileage, mileageRate = 0.67 }) {
+  const expenseTotal = expenses.reduce((s, e) => s + (parseFloat(e.amount) || 0), 0)
+  const milesTotal = mileage.reduce((s, m) => s + (parseFloat(m.miles) || 0), 0)
+  const mileageDeduction = milesTotal * mileageRate
+
+  const byCategory = expenses.reduce((acc, e) => {
+    const c = e.category || 'Uncategorized'
+    acc[c] = (acc[c] || 0) + (parseFloat(e.amount) || 0)
+    return acc
+  }, {})
+  const sortedCats = Object.entries(byCategory).sort((a, b) => b[1] - a[1])
+
+  return (
+    <Document>
+      <Page size="LETTER" style={styles.page}>
+        <Header profile={profile} title={`${year} TAX REPORT`} number={`Prepared ${new Date().toLocaleDateString()}`} />
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Summary</Text>
+          <View style={{ flexDirection: 'row', gap: 12, marginTop: 6 }}>
+            <View style={{ flex: 1, padding: 10, backgroundColor: '#F9FAFB', borderRadius: 4 }}>
+              <Text style={{ fontSize: 8, color: '#6B7280', textTransform: 'uppercase' }}>Total Expenses</Text>
+              <Text style={{ fontSize: 14, fontWeight: 'bold', marginTop: 2 }}>{money(expenseTotal)}</Text>
+            </View>
+            <View style={{ flex: 1, padding: 10, backgroundColor: '#F9FAFB', borderRadius: 4 }}>
+              <Text style={{ fontSize: 8, color: '#6B7280', textTransform: 'uppercase' }}>Business Miles</Text>
+              <Text style={{ fontSize: 14, fontWeight: 'bold', marginTop: 2 }}>{milesTotal.toFixed(0)}</Text>
+            </View>
+            <View style={{ flex: 1, padding: 10, backgroundColor: '#ECFDF5', borderRadius: 4 }}>
+              <Text style={{ fontSize: 8, color: '#047857', textTransform: 'uppercase' }}>Mileage Deduction</Text>
+              <Text style={{ fontSize: 14, fontWeight: 'bold', marginTop: 2, color: '#047857' }}>{money(mileageDeduction)}</Text>
+              <Text style={{ fontSize: 7, color: '#6B7280', marginTop: 2 }}>@ ${mileageRate.toFixed(2)}/mi (IRS rate)</Text>
+            </View>
+          </View>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Expenses by Category</Text>
+          <View style={styles.table}>
+            <View style={styles.th}>
+              <Text style={{ flex: 3 }}>Category</Text>
+              <Text style={{ flex: 1, textAlign: 'right' }}>Count</Text>
+              <Text style={{ flex: 1.5, textAlign: 'right' }}>Total</Text>
+            </View>
+            {sortedCats.map(([cat, total]) => {
+              const count = expenses.filter(e => (e.category || 'Uncategorized') === cat).length
+              return (
+                <View key={cat} style={styles.tr}>
+                  <Text style={{ flex: 3 }}>{cat}</Text>
+                  <Text style={{ flex: 1, textAlign: 'right' }}>{count}</Text>
+                  <Text style={{ flex: 1.5, textAlign: 'right' }}>{money(total)}</Text>
+                </View>
+              )
+            })}
+            <View style={{ ...styles.tr, backgroundColor: '#F9FAFB', fontWeight: 'bold' }}>
+              <Text style={{ flex: 3, fontWeight: 'bold' }}>Total</Text>
+              <Text style={{ flex: 1, textAlign: 'right', fontWeight: 'bold' }}>{expenses.length}</Text>
+              <Text style={{ flex: 1.5, textAlign: 'right', fontWeight: 'bold' }}>{money(expenseTotal)}</Text>
+            </View>
+          </View>
+        </View>
+
+        <View style={{ ...styles.notes, backgroundColor: '#FFFBEB', borderLeftWidth: 3, borderLeftColor: '#F59E0B', borderRadius: 2 }}>
+          <Text style={{ fontSize: 9, fontWeight: 'bold', marginBottom: 4 }}>Important</Text>
+          <Text style={styles.pre}>
+            This report summarizes records you entered into ContractorPro. It is not tax advice and does not account for home office, Section 179, depreciation, or other deductions. Bring it to a CPA along with original receipts. IRS standard mileage rate shown is ${mileageRate.toFixed(2)}/mi — verify current year's rate.
+          </Text>
+        </View>
+
+        <Text style={styles.footer} fixed>{profile?.business_name || 'ContractorPro'} — {year} Tax Report</Text>
+      </Page>
+
+      <Page size="LETTER" style={styles.page}>
+        <Text style={{ fontSize: 12, fontWeight: 'bold', marginBottom: 12 }}>Expense Detail — {year}</Text>
+        <View style={styles.table}>
+          <View style={styles.th}>
+            <Text style={{ flex: 1.2 }}>Date</Text>
+            <Text style={{ flex: 1.5 }}>Category</Text>
+            <Text style={{ flex: 2 }}>Vendor</Text>
+            <Text style={{ flex: 1.2, textAlign: 'right' }}>Amount</Text>
+          </View>
+          {expenses.slice().sort((a,b) => (a.date||'').localeCompare(b.date||'')).map((e, i) => (
+            <View key={i} style={styles.tr}>
+              <Text style={{ flex: 1.2 }}>{e.date || ''}</Text>
+              <Text style={{ flex: 1.5 }}>{e.category || ''}</Text>
+              <Text style={{ flex: 2 }}>{e.vendor || ''}</Text>
+              <Text style={{ flex: 1.2, textAlign: 'right' }}>{money(e.amount)}</Text>
+            </View>
+          ))}
+        </View>
+
+        {mileage.length > 0 && (
+          <>
+            <Text style={{ fontSize: 12, fontWeight: 'bold', marginTop: 20, marginBottom: 12 }}>Mileage Log — {year}</Text>
+            <View style={styles.table}>
+              <View style={styles.th}>
+                <Text style={{ flex: 1.2 }}>Date</Text>
+                <Text style={{ flex: 3 }}>Route</Text>
+                <Text style={{ flex: 2 }}>Purpose</Text>
+                <Text style={{ flex: 1, textAlign: 'right' }}>Miles</Text>
+              </View>
+              {mileage.slice().sort((a,b) => (a.date||'').localeCompare(b.date||'')).map((m, i) => (
+                <View key={i} style={styles.tr}>
+                  <Text style={{ flex: 1.2 }}>{m.date || ''}</Text>
+                  <Text style={{ flex: 3 }}>{m.from_location} → {m.to_location}</Text>
+                  <Text style={{ flex: 2 }}>{m.purpose || ''}</Text>
+                  <Text style={{ flex: 1, textAlign: 'right' }}>{parseFloat(m.miles || 0).toFixed(1)}</Text>
+                </View>
+              ))}
+            </View>
+          </>
+        )}
+
+        <Text style={styles.footer} fixed>{profile?.business_name || 'ContractorPro'} — {year} Tax Report</Text>
+      </Page>
+    </Document>
+  )
+}
+
 export async function downloadPdf(doc, filename) {
   const blob = await pdf(doc).toBlob()
   const url = URL.createObjectURL(blob)
