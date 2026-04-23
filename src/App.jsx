@@ -8,6 +8,7 @@ import KeyboardShortcuts from './components/KeyboardShortcuts'
 import CommandPalette from './components/CommandPalette'
 import QuickAdd from './components/QuickAdd'
 import MobileTabs from './components/MobileTabs'
+import TopSearch from './components/TopSearch'
 
 import Login               from './pages/Login'
 import Signup              from './pages/Signup'
@@ -60,6 +61,7 @@ export default function App() {
       <BrowserRouter>
         <KeyboardShortcuts />
         <CommandPalette />
+        <TopSearch />
         <QuickAdd />
         <Routes>
           {/* Public auth routes */}
