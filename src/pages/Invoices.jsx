@@ -6,6 +6,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { useToast } from '../components/Toast'
 import { InvoicePDF, downloadPdf } from '../lib/pdf'
 import EmailModal from '../components/EmailModal'
+import { emailServerEnabled } from '../lib/email'
 
 const STATUS_COLORS = { Draft:'bg-gray-100 text-gray-600', Sent:'bg-blue-100 text-blue-700', Paid:'bg-green-100 text-green-700', Overdue:'bg-red-100 text-red-700' }
 const STATUS_ICONS  = { Draft:Clock, Sent:AlertCircle, Paid:CheckCircle2, Overdue:AlertCircle }
@@ -241,7 +242,7 @@ export default function Invoices() {
                   <button onClick={() => downloadInvoicePdf(inv)} disabled={pdfingId === inv.id} title="Download PDF" className="btn-ghost text-xs py-1 px-2">
                     <Download size={14} /> {pdfingId === inv.id ? 'Preparing…' : 'PDF'}
                   </button>
-                  <button onClick={() => setEmailOpen(inv)} title="Email invoice" className="btn-ghost text-xs py-1 px-2">
+                  <button onClick={() => emailServerEnabled ? setEmailOpen(inv) : mailtoFallback(inv)} title="Email invoice" className="btn-ghost text-xs py-1 px-2">
                     <Mail size={14} /> Email
                   </button>
                   {inv.status === 'Paid' && (

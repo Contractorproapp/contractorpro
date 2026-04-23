@@ -8,6 +8,7 @@ import AiOutput from '../components/AiOutput'
 import VoiceButton from '../components/VoiceButton'
 import { EstimatePDF, downloadPdf } from '../lib/pdf'
 import EmailModal from '../components/EmailModal'
+import { emailServerEnabled } from '../lib/email'
 
 const SYSTEM = `You are an expert contractor estimating assistant. You write clear, professional, itemized estimates for contractors (plumbers, electricians, roofers, HVAC, general contractors, etc.).
 
@@ -116,7 +117,7 @@ function EstimateCard({ est, profile, onDelete, onConvert }) {
             <button onClick={downloadAsPdf} disabled={pdfing} className="btn-ghost text-xs py-1 px-2">
               <Download size={13} /> {pdfing ? 'Preparing…' : 'PDF'}
             </button>
-            <button onClick={() => setEmailing(true)} className="btn-ghost text-xs py-1 px-2">
+            <button onClick={() => emailServerEnabled ? setEmailing(true) : mailtoFallback()} className="btn-ghost text-xs py-1 px-2">
               <Mail size={13} /> Email
             </button>
             <button onClick={() => onConvert(est)} className="btn-ghost text-brand-600 text-xs py-1 px-2">
