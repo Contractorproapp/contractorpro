@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Save, Upload, Eye, EyeOff, CheckCircle2, Loader2, ExternalLink, CreditCard } from 'lucide-react'
+import { Save, Upload, Eye, EyeOff, CheckCircle2, Loader2, ExternalLink, CreditCard, Lock } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { useToast } from '../components/Toast'
@@ -30,6 +30,70 @@ function AiUsageCard() {
       <p className="text-xs text-gray-400">
         Daily cap on Claude API calls (estimates, follow-ups, marketing). Resets every 24h. Protects you from runaway costs if your key leaks.
       </p>
+    </div>
+  )
+}
+
+function ChangePasswordCard() {
+  const { updatePassword } = useAuth()
+  const toast = useToast()
+  const [pw, setPw]         = useState('')
+  const [confirm, setConf]  = useState('')
+  const [show, setShow]     = useState(false)
+  const [busy, setBusy]     = useState(false)
+  const [err, setErr]       = useState('')
+
+  const submit = async () => {
+    setErr('')
+    if (pw.length < 8) return setErr('Password must be at least 8 characters.')
+    if (pw !== confirm) return setErr('Passwords do not match.')
+    setBusy(true)
+    const { error } = await updatePassword(pw)
+    setBusy(false)
+    if (error) return setErr(error.message)
+    setPw(''); setConf('')
+    toast.success('Password updated')
+  }
+
+  return (
+    <div className="card p-5 space-y-4">
+      <div className="flex items-center gap-2">
+        <Lock size={16} className="text-gray-500" />
+        <h2 className="font-semibold">Change Password</h2>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label className="label">New Password</label>
+          <div className="relative">
+            <input
+              className="input pr-10"
+              type={show ? 'text' : 'password'}
+              placeholder="At least 8 characters"
+              value={pw}
+              onChange={e => setPw(e.target.value)}
+            />
+            <button onClick={() => setShow(s => !s)} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400">
+              {show ? <EyeOff size={16} /> : <Eye size={16} />}
+            </button>
+          </div>
+        </div>
+        <div>
+          <label className="label">Confirm Password</label>
+          <input
+            className="input"
+            type={show ? 'text' : 'password'}
+            placeholder="Retype new password"
+            value={confirm}
+            onChange={e => setConf(e.target.value)}
+          />
+        </div>
+      </div>
+      {err && <p className="text-sm text-red-600">{err}</p>}
+      <div className="flex justify-end">
+        <button onClick={submit} disabled={busy || !pw || !confirm} className="btn-primary">
+          {busy ? <Loader2 size={15} className="animate-spin" /> : <><Lock size={15} /> Update Password</>}
+        </button>
+      </div>
     </div>
   )
 }
@@ -177,6 +241,8 @@ export default function Profile() {
           </button>
         </div>
       </div>
+
+      <ChangePasswordCard />
 
       <AiUsageCard />
 

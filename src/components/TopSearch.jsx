@@ -13,7 +13,7 @@ export default function TopSearch() {
   }, [])
 
   if (!user) return null
-  const hideOn = ['/login', '/signup', '/onboarding', '/subscribe', '/privacy', '/terms']
+  const hideOn = ['/login', '/signup', '/forgot-password', '/reset-password', '/onboarding', '/subscribe', '/privacy', '/terms']
   if (hideOn.some(p => location.pathname.startsWith(p))) return null
   if (location.pathname.startsWith('/invoice/') || location.pathname.startsWith('/estimate/') || location.pathname.startsWith('/project/')) return null
 

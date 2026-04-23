@@ -45,6 +45,12 @@ export function AuthProvider({ children }) {
 
   const signOut = () => supabase.auth.signOut()
 
+  const resetPassword = (email) =>
+    supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/reset-password` })
+
+  const updatePassword = (password) =>
+    supabase.auth.updateUser({ password })
+
   const refreshProfile = () => user && fetchProfile(user.id)
 
   const isSubscribed = profile?.subscription_status === 'active'
@@ -53,7 +59,7 @@ export function AuthProvider({ children }) {
   return (
     <AuthContext.Provider value={{
       user, profile, loading, isSubscribed, onboardingComplete,
-      signUp, signIn, signInWithGoogle, signOut, refreshProfile,
+      signUp, signIn, signInWithGoogle, signOut, resetPassword, updatePassword, refreshProfile,
     }}>
       {children}
     </AuthContext.Provider>

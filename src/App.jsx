@@ -12,6 +12,8 @@ import TopSearch from './components/TopSearch'
 
 import Login               from './pages/Login'
 import Signup              from './pages/Signup'
+import ForgotPassword      from './pages/ForgotPassword'
+import ResetPassword       from './pages/ResetPassword'
 import Onboarding          from './pages/Onboarding'
 import Paywall             from './pages/Paywall'
 import SubscriptionSuccess from './pages/SubscriptionSuccess'
@@ -67,6 +69,8 @@ export default function App() {
           {/* Public auth routes */}
           <Route path="/login"    element={<Login />} />
           <Route path="/signup"   element={<Signup />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password"  element={<ResetPassword />} />
 
           {/* Post-signup flow (auth required, sub not required) */}
           <Route path="/onboarding"         element={<Onboarding />} />
