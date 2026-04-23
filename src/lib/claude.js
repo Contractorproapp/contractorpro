@@ -24,6 +24,16 @@ export async function streamClaude({ prompt, system, onChunk, onDone, onError })
       return
     }
 
+    const used = parseInt(res.headers.get('X-Usage-Used') || '0', 10)
+    const limit = parseInt(res.headers.get('X-Usage-Limit') || '0', 10)
+    if (limit && used) {
+      const pct = used / limit
+      if (pct >= 0.8) {
+        // Surface threshold warnings via a custom event the UI can listen to
+        window.dispatchEvent(new CustomEvent('ai-usage', { detail: { used, limit, pct } }))
+      }
+    }
+
     const reader = res.body.getReader()
     const decoder = new TextDecoder()
     let buffer = '', full = ''

@@ -3,6 +3,36 @@ import { Save, Upload, Eye, EyeOff, CheckCircle2, Loader2, ExternalLink, CreditC
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 
+const DAILY_LIMIT = 350
+
+function AiUsageCard() {
+  const { user } = useAuth()
+  const [used, setUsed] = useState(null)
+
+  useEffect(() => {
+    if (!user) return
+    supabase.rpc('ai_usage_today', { uid: user.id }).then(({ data }) => setUsed(data ?? 0))
+  }, [user])
+
+  const pct = used == null ? 0 : Math.min(100, (used / DAILY_LIMIT) * 100)
+  const color = pct >= 100 ? 'bg-red-500' : pct >= 80 ? 'bg-yellow-500' : 'bg-brand-500'
+
+  return (
+    <div className="card p-5 space-y-3">
+      <div className="flex items-center justify-between">
+        <h2 className="font-semibold">AI Usage Today</h2>
+        <span className="text-sm text-gray-500">{used ?? '—'} / {DAILY_LIMIT}</span>
+      </div>
+      <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+        <div className={`h-full ${color} transition-all`} style={{ width: `${pct}%` }} />
+      </div>
+      <p className="text-xs text-gray-400">
+        Daily cap on Claude API calls (estimates, follow-ups, marketing). Resets every 24h. Protects you from runaway costs if your key leaks.
+      </p>
+    </div>
+  )
+}
+
 export default function Profile() {
   const { user, profile, refreshProfile } = useAuth()
   const [businessName, setBusinessName] = useState('')
@@ -145,6 +175,8 @@ export default function Profile() {
           </button>
         </div>
       </div>
+
+      <AiUsageCard />
 
       {/* Billing */}
       <div className="card p-5 space-y-3">
