@@ -1,22 +1,30 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { Plus, Trash2, Receipt, AlertCircle, CheckCircle2, Clock, Link, Mail, Loader2, Star } from 'lucide-react'
+import { Plus, Trash2, Receipt, AlertCircle, CheckCircle2, Clock, Link, Mail, Loader2, Star, Download } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { useToast } from '../components/Toast'
+import { InvoicePDF, downloadPdf } from '../lib/pdf'
 
 const STATUS_COLORS = { Draft:'bg-gray-100 text-gray-600', Sent:'bg-blue-100 text-blue-700', Paid:'bg-green-100 text-green-700', Overdue:'bg-red-100 text-red-700' }
 const STATUS_ICONS  = { Draft:Clock, Sent:AlertCircle, Paid:CheckCircle2, Overdue:AlertCircle }
 const uid = () => Math.random().toString(36).slice(2)
 
-function InvoiceForm({ userId, onSave, onCancel }) {
+function InvoiceForm({ userId, onSave, onCancel, prefill }) {
   const [form, setForm] = useState({
-    client_name:'', client_phone:'', client_email:'', job_title:'',
+    client_name: prefill?.client_name || '',
+    client_phone: prefill?.client_phone || '',
+    client_email: prefill?.client_email || '',
+    job_title: prefill?.job_title || '',
     invoice_number:`INV-${Date.now().toString().slice(-5)}`,
     issue_date: new Date().toISOString().slice(0,10),
     due_date:'', notes:'', status:'Draft', payment_link:'',
   })
-  const [lineItems, setLineItems] = useState([{ id:uid(), desc:'', qty:'1', unit:'' }])
+  const [lineItems, setLineItems] = useState(
+    prefill?.line_items?.length
+      ? prefill.line_items.map(li => ({ id: uid(), desc: li.desc || '', qty: String(li.qty || '1'), unit: String(li.unit || '') }))
+      : [{ id:uid(), desc:'', qty:'1', unit:'' }]
+  )
   const [taxRate, setTaxRate] = useState('0')
   const [saving, setSaving]   = useState(false)
 
@@ -107,11 +115,20 @@ export default function Invoices() {
   const [invoices, setInvoices] = useState([])
   const [fetching, setFetching] = useState(true)
   const [showForm, setShowForm] = useState(false)
+  const [prefill, setPrefill]   = useState(null)
   const [copied, setCopied]     = useState(null)
   const [searchParams, setSearchParams] = useSearchParams()
 
   useEffect(() => {
-    if (searchParams.get('new') === '1') {
+    if (searchParams.get('from_estimate') === '1') {
+      const raw = sessionStorage.getItem('invoice_from_estimate')
+      if (raw) {
+        try { setPrefill(JSON.parse(raw)) } catch {}
+        sessionStorage.removeItem('invoice_from_estimate')
+      }
+      setShowForm(true)
+      setSearchParams({}, { replace: true })
+    } else if (searchParams.get('new') === '1') {
       setShowForm(true)
       setSearchParams({}, { replace: true })
     }
@@ -146,6 +163,16 @@ export default function Invoices() {
     window.open(`sms:${inv.client_phone || ''}?&body=${msg}`)
   }
 
+  const [pdfingId, setPdfingId] = useState(null)
+  const downloadInvoicePdf = async (inv) => {
+    setPdfingId(inv.id)
+    try {
+      await downloadPdf(<InvoicePDF invoice={inv} profile={profile} />, `Invoice-${inv.invoice_number || inv.id}.pdf`)
+    } finally {
+      setPdfingId(null)
+    }
+  }
+
   const emailInvoice = (inv) => {
     const link    = `${window.location.origin}/invoice/${inv.public_token}`
     const subject = encodeURIComponent(`Invoice from ${profile?.business_name || 'Your Contractor'} — ${inv.invoice_number}`)
@@ -172,7 +199,7 @@ export default function Invoices() {
         <div className="card p-4"><div className="text-xs text-gray-500 uppercase tracking-wide">Total</div><div className="text-2xl font-bold text-gray-700 mt-1">{invoices.length}</div></div>
       </div>
 
-      {showForm && <InvoiceForm userId={user?.id} onSave={saveInvoice} onCancel={() => setShowForm(false)} />}
+      {showForm && <InvoiceForm userId={user?.id} prefill={prefill} onSave={(inv) => { saveInvoice(inv); setPrefill(null) }} onCancel={() => { setShowForm(false); setPrefill(null) }} />}
 
       <div className="space-y-2">
         {fetching && <div className="flex justify-center py-8"><Loader2 size={24} className="animate-spin text-gray-400" /></div>}
@@ -202,6 +229,9 @@ export default function Invoices() {
                     className={`badge border-0 cursor-pointer ${STATUS_COLORS[inv.status]}`}>
                     <option>Draft</option><option>Sent</option><option>Paid</option><option>Overdue</option>
                   </select>
+                  <button onClick={() => downloadInvoicePdf(inv)} disabled={pdfingId === inv.id} title="Download PDF" className="btn-ghost text-xs py-1 px-2">
+                    <Download size={14} /> {pdfingId === inv.id ? 'Preparing…' : 'PDF'}
+                  </button>
                   <button onClick={() => emailInvoice(inv)} title="Email invoice" className="btn-ghost text-xs py-1 px-2">
                     <Mail size={14} /> Email
                   </button>

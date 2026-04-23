@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react'
-import { useSearchParams } from 'react-router-dom'
-import { Plus, Trash2, ChevronDown, ChevronUp, FileText, Sparkles, Loader2, Link as LinkIcon, CheckCircle2 } from 'lucide-react'
+import { useSearchParams, useNavigate } from 'react-router-dom'
+import { Plus, Trash2, ChevronDown, ChevronUp, FileText, Sparkles, Loader2, Link as LinkIcon, CheckCircle2, Receipt, Download, Mail } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { streamClaude } from '../lib/claude'
 import { useAuth } from '../contexts/AuthContext'
 import AiOutput from '../components/AiOutput'
 import VoiceButton from '../components/VoiceButton'
+import { EstimatePDF, downloadPdf } from '../lib/pdf'
 
 const SYSTEM = `You are an expert contractor estimating assistant. You write clear, professional, itemized estimates for contractors (plumbers, electricians, roofers, HVAC, general contractors, etc.).
 
@@ -39,10 +40,11 @@ function LineItem({ item, onChange, onRemove }) {
   )
 }
 
-function EstimateCard({ est, onDelete }) {
+function EstimateCard({ est, profile, onDelete, onConvert }) {
   const [open, setOpen] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [pdfing, setPdfing] = useState(false)
   const statusColors = { Draft:'badge-info', Sent:'badge-accent', Accepted:'badge-success', Declined:'badge-danger' }
 
   const handleDelete = async () => {
@@ -54,6 +56,26 @@ function EstimateCard({ est, onDelete }) {
     navigator.clipboard.writeText(`${window.location.origin}/estimate/${est.public_token}`)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
+  }
+
+  const emailClient = () => {
+    const subject = encodeURIComponent(`Estimate for ${est.job_title || 'your project'}`)
+    const shareUrl = est.public_token ? `${window.location.origin}/estimate/${est.public_token}` : ''
+    const body = encodeURIComponent(
+      `Hi ${est.client_name || ''},\n\nPlease find my estimate for ${est.job_title || 'your project'} below.\n\n` +
+      (shareUrl ? `View and sign online: ${shareUrl}\n\n` : '') +
+      `Total: $${(est.total || 0).toFixed(2)}\n\nThanks,\n${profile?.business_name || ''}`
+    )
+    window.location.href = `mailto:${est.email || ''}?subject=${subject}&body=${body}`
+  }
+
+  const downloadAsPdf = async () => {
+    setPdfing(true)
+    try {
+      await downloadPdf(<EstimatePDF estimate={est} profile={profile} />, `Estimate-${est.client_name || 'client'}.pdf`)
+    } finally {
+      setPdfing(false)
+    }
   }
 
   return (
@@ -78,12 +100,21 @@ function EstimateCard({ est, onDelete }) {
           {est.output && (
             <pre className="whitespace-pre-wrap text-xs text-gray-700 font-sans leading-relaxed bg-gray-50 p-3 rounded-lg max-h-72 overflow-y-auto">{est.output}</pre>
           )}
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             {est.public_token && (
               <button onClick={copyLink} className="btn-ghost text-xs py-1 px-2">
                 <LinkIcon size={13} /> {copied ? 'Copied!' : 'Share for Signature'}
               </button>
             )}
+            <button onClick={downloadAsPdf} disabled={pdfing} className="btn-ghost text-xs py-1 px-2">
+              <Download size={13} /> {pdfing ? 'Preparing…' : 'PDF'}
+            </button>
+            <button onClick={emailClient} className="btn-ghost text-xs py-1 px-2">
+              <Mail size={13} /> Email
+            </button>
+            <button onClick={() => onConvert(est)} className="btn-ghost text-brand-600 text-xs py-1 px-2">
+              <Receipt size={13} /> Convert to Invoice
+            </button>
             <button onClick={handleDelete} disabled={deleting} className="btn-ghost text-red-500 text-xs py-1 px-2">
               <Trash2 size={13} /> {deleting ? 'Deleting…' : 'Delete'}
             </button>
@@ -169,6 +200,18 @@ Subtotal: $${subtotal.toFixed(2)} | Total with markup: $${total.toFixed(2)}`
   const deleteEstimate = async (id) => {
     await supabase.from('estimates').delete().eq('id', id)
     setEstimates(prev => prev.filter(e => e.id !== id))
+  }
+
+  const navigate = useNavigate()
+  const convertToInvoice = (est) => {
+    sessionStorage.setItem('invoice_from_estimate', JSON.stringify({
+      client_name: est.client_name || '',
+      client_phone: est.phone || '',
+      client_email: est.email || '',
+      job_title: est.job_title || '',
+      line_items: est.line_items || [],
+    }))
+    navigate('/invoices?from_estimate=1')
   }
 
   return (
@@ -267,7 +310,7 @@ Subtotal: $${subtotal.toFixed(2)} | Total with markup: $${total.toFixed(2)}`
             <p className="text-sm">No estimates yet. Create your first one above.</p>
           </div>
         )}
-        {estimates.map(est => <EstimateCard key={est.id} est={est} onDelete={deleteEstimate} />)}
+        {estimates.map(est => <EstimateCard key={est.id} est={est} profile={profile} onDelete={deleteEstimate} onConvert={convertToInvoice} />)}
       </div>
     </div>
   )
