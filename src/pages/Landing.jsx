@@ -99,6 +99,10 @@ export default function Landing() {
               <li className="flex gap-2"><Zap size={16} className="text-brand-400 shrink-0 mt-0.5" /> Cancel anytime</li>
             </ul>
             <Link to="/signup" className="btn-primary w-full mt-6 justify-center">Start Free Trial →</Link>
+            <p className="text-xs text-gray-400 mt-4 leading-relaxed">
+              Plus your own Anthropic API usage — typically <strong className="text-gray-200">pennies per estimate</strong>.
+              You bring your own API key so AI costs are billed directly to you by Anthropic (no markup from us).
+            </p>
           </div>
         </div>
       </section>
