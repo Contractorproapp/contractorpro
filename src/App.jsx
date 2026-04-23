@@ -5,6 +5,9 @@ import Sidebar from './components/Sidebar'
 import UsageWarning from './components/UsageWarning'
 import { ToastProvider } from './components/Toast'
 import KeyboardShortcuts from './components/KeyboardShortcuts'
+import CommandPalette from './components/CommandPalette'
+import QuickAdd from './components/QuickAdd'
+import MobileTabs from './components/MobileTabs'
 
 import Login               from './pages/Login'
 import Signup              from './pages/Signup'
@@ -41,9 +44,10 @@ function AppShell({ children }) {
   return (
     <div className="flex min-h-screen">
       <Sidebar />
-      <main className="flex-1 p-4 lg:p-8 overflow-y-auto">
+      <main className="flex-1 p-4 lg:p-8 pb-20 lg:pb-8 overflow-y-auto">
         {children}
       </main>
+      <MobileTabs onMore={() => window.dispatchEvent(new CustomEvent('open-mobile-drawer'))} />
     </div>
   )
 }
@@ -55,6 +59,8 @@ export default function App() {
       <UsageWarning />
       <BrowserRouter>
         <KeyboardShortcuts />
+        <CommandPalette />
+        <QuickAdd />
         <Routes>
           {/* Public auth routes */}
           <Route path="/login"    element={<Login />} />

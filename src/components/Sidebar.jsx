@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import {
   FileText, Users, Receipt, FolderOpen, Megaphone,
@@ -41,6 +41,12 @@ export default function Sidebar() {
   const { user, profile, signOut } = useAuth()
   const navigate = useNavigate()
   const [mobileOpen, setMobileOpen] = useState(false)
+
+  useEffect(() => {
+    const handler = () => setMobileOpen(true)
+    window.addEventListener('open-mobile-drawer', handler)
+    return () => window.removeEventListener('open-mobile-drawer', handler)
+  }, [])
 
   const close = () => setMobileOpen(false)
 

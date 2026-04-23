@@ -6,6 +6,7 @@ import {
 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
+import OnboardingChecklist from '../components/OnboardingChecklist'
 
 const IRS_MILEAGE_RATE = 0.67
 const DAY_MS = 24 * 60 * 60 * 1000
@@ -122,6 +123,12 @@ export default function Dashboard() {
         <h1 className="text-2xl font-bold">{hi}, {firstName}</h1>
         <p className="text-gray-500 text-sm mt-0.5">Here's what needs attention today</p>
       </div>
+
+      <OnboardingChecklist profile={profile} counts={{
+        estimates: data.estimates.length,
+        leads: data.leads.length,
+        invoices: data.invoices.length,
+      }} />
 
       {/* Money stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
