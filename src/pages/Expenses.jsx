@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { Plus, Trash2, Download, Upload, Car, Receipt as ReceiptIcon, Loader2, X, Info } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
@@ -25,6 +26,15 @@ export default function Expenses() {
   const blankMileage = { date: new Date().toISOString().slice(0, 10), from_location: '', to_location: '', miles: '', purpose: '', project_id: '' }
   const [eForm, setEForm] = useState(blankExpense)
   const [mForm, setMForm] = useState(blankMileage)
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  useEffect(() => {
+    if (searchParams.get('new') === '1') {
+      setTab('expenses')
+      setShowExpense(true)
+      setSearchParams({}, { replace: true })
+    }
+  }, [])
 
   useEffect(() => {
     if (!user) return

@@ -50,7 +50,7 @@ export default function QuickAdd() {
             <div className="grid grid-cols-2 gap-2">
               {ITEMS.map(({ to, Icon, label, color }) => (
                 <button key={to}
-                  onClick={() => { setOpen(false); navigate(to) }}
+                  onClick={() => { setOpen(false); navigate(`${to}?new=1`) }}
                   className="flex flex-col items-center gap-2 p-4 rounded-lg border border-gray-200 hover:border-brand-500 hover:shadow-md transition-all">
                   <div className={`w-10 h-10 rounded-full ${color} text-white flex items-center justify-center`}>
                     <Icon size={18} />

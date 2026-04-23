@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { Plus, Trash2, Receipt, AlertCircle, CheckCircle2, Clock, Link, Mail, Loader2, Star } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
@@ -107,6 +108,14 @@ export default function Invoices() {
   const [fetching, setFetching] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [copied, setCopied]     = useState(null)
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  useEffect(() => {
+    if (searchParams.get('new') === '1') {
+      setShowForm(true)
+      setSearchParams({}, { replace: true })
+    }
+  }, [])
 
   useEffect(() => {
     if (!user) return

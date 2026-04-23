@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { Plus, Trash2, ChevronDown, ChevronUp, FileText, Sparkles, Loader2, Link as LinkIcon, CheckCircle2 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { streamClaude } from '../lib/claude'
@@ -106,6 +107,14 @@ export default function Estimates() {
   const [output, setOutput]   = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError]     = useState('')
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  useEffect(() => {
+    if (searchParams.get('new') === '1') {
+      setShowForm(true)
+      setSearchParams({}, { replace: true })
+    }
+  }, [])
 
   useEffect(() => {
     if (!user) return

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { Plus, FolderOpen, FileText, AlertTriangle, Trash2, ChevronDown, ChevronUp, Link, Loader2, Camera, X } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
@@ -19,6 +20,14 @@ export default function Projects() {
   const [form, setForm] = useState({ name:'', client:'', address:'', start_date:'', end_date:'', status:'Planning', description:'' })
   const [noteInputs, setNoteInputs]           = useState({})
   const [changeOrderInputs, setChangeOrderInputs] = useState({})
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  useEffect(() => {
+    if (searchParams.get('new') === '1') {
+      setShowForm(true)
+      setSearchParams({}, { replace: true })
+    }
+  }, [])
 
   useEffect(() => {
     if (!user) return
