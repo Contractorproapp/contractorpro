@@ -7,6 +7,7 @@ import { useAuth } from '../contexts/AuthContext'
 import AiOutput from '../components/AiOutput'
 import VoiceButton from '../components/VoiceButton'
 import { EstimatePDF, downloadPdf } from '../lib/pdf'
+import EmailModal from '../components/EmailModal'
 
 const SYSTEM = `You are an expert contractor estimating assistant. You write clear, professional, itemized estimates for contractors (plumbers, electricians, roofers, HVAC, general contractors, etc.).
 
@@ -45,6 +46,7 @@ function EstimateCard({ est, profile, onDelete, onConvert }) {
   const [deleting, setDeleting] = useState(false)
   const [copied, setCopied] = useState(false)
   const [pdfing, setPdfing] = useState(false)
+  const [emailing, setEmailing] = useState(false)
   const statusColors = { Draft:'badge-info', Sent:'badge-accent', Accepted:'badge-success', Declined:'badge-danger' }
 
   const handleDelete = async () => {
@@ -58,15 +60,20 @@ function EstimateCard({ est, profile, onDelete, onConvert }) {
     setTimeout(() => setCopied(false), 2000)
   }
 
-  const emailClient = () => {
-    const subject = encodeURIComponent(`Estimate for ${est.job_title || 'your project'}`)
+  const buildEmail = () => {
     const shareUrl = est.public_token ? `${window.location.origin}/estimate/${est.public_token}` : ''
-    const body = encodeURIComponent(
-      `Hi ${est.client_name || ''},\n\nPlease find my estimate for ${est.job_title || 'your project'} below.\n\n` +
-      (shareUrl ? `View and sign online: ${shareUrl}\n\n` : '') +
-      `Total: $${(est.total || 0).toFixed(2)}\n\nThanks,\n${profile?.business_name || ''}`
-    )
-    window.location.href = `mailto:${est.email || ''}?subject=${subject}&body=${body}`
+    return {
+      to: est.email || '',
+      subject: `Estimate for ${est.job_title || 'your project'}`,
+      body:
+        `Hi ${est.client_name || ''},\n\nPlease find my estimate for ${est.job_title || 'your project'} below.\n\n` +
+        (shareUrl ? `View and sign online: ${shareUrl}\n\n` : '') +
+        `Total: $${(est.total || 0).toFixed(2)}\n\nThanks,\n${profile?.business_name || ''}`,
+    }
+  }
+  const mailtoFallback = () => {
+    const m = buildEmail()
+    window.location.href = `mailto:${m.to}?subject=${encodeURIComponent(m.subject)}&body=${encodeURIComponent(m.body)}`
   }
 
   const downloadAsPdf = async () => {
@@ -109,7 +116,7 @@ function EstimateCard({ est, profile, onDelete, onConvert }) {
             <button onClick={downloadAsPdf} disabled={pdfing} className="btn-ghost text-xs py-1 px-2">
               <Download size={13} /> {pdfing ? 'Preparing…' : 'PDF'}
             </button>
-            <button onClick={emailClient} className="btn-ghost text-xs py-1 px-2">
+            <button onClick={() => setEmailing(true)} className="btn-ghost text-xs py-1 px-2">
               <Mail size={13} /> Email
             </button>
             <button onClick={() => onConvert(est)} className="btn-ghost text-brand-600 text-xs py-1 px-2">
@@ -121,6 +128,20 @@ function EstimateCard({ est, profile, onDelete, onConvert }) {
           </div>
         </div>
       )}
+      {emailing && (() => {
+        const m = buildEmail()
+        return (
+          <EmailModal
+            open
+            onClose={() => setEmailing(false)}
+            initialTo={m.to}
+            initialSubject={m.subject}
+            initialBody={m.body}
+            kind="estimate"
+            mailtoFallback={mailtoFallback}
+          />
+        )
+      })()}
     </div>
   )
 }

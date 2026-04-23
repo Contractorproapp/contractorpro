@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { useToast } from '../components/Toast'
 import { InvoicePDF, downloadPdf } from '../lib/pdf'
+import EmailModal from '../components/EmailModal'
 
 const STATUS_COLORS = { Draft:'bg-gray-100 text-gray-600', Sent:'bg-blue-100 text-blue-700', Paid:'bg-green-100 text-green-700', Overdue:'bg-red-100 text-red-700' }
 const STATUS_ICONS  = { Draft:Clock, Sent:AlertCircle, Paid:CheckCircle2, Overdue:AlertCircle }
@@ -164,6 +165,7 @@ export default function Invoices() {
   }
 
   const [pdfingId, setPdfingId] = useState(null)
+  const [emailOpen, setEmailOpen] = useState(null)
   const downloadInvoicePdf = async (inv) => {
     setPdfingId(inv.id)
     try {
@@ -173,11 +175,18 @@ export default function Invoices() {
     }
   }
 
-  const emailInvoice = (inv) => {
-    const link    = `${window.location.origin}/invoice/${inv.public_token}`
-    const subject = encodeURIComponent(`Invoice from ${profile?.business_name || 'Your Contractor'} — ${inv.invoice_number}`)
-    const body    = encodeURIComponent(`Hi ${inv.client_name || 'there'},\n\nPlease find your invoice here:\n${link}\n\nTotal Due: $${(inv.total||0).toFixed(2)}\nDue Date: ${inv.due_date || 'Upon receipt'}\n\nThank you for your business!\n${profile?.business_name || ''}\n${profile?.phone || ''}`)
-    window.open(`mailto:${inv.client_email || ''}?subject=${subject}&body=${body}`)
+  const buildInvoiceEmail = (inv) => {
+    const link = `${window.location.origin}/invoice/${inv.public_token}`
+    return {
+      to: inv.client_email || '',
+      subject: `Invoice from ${profile?.business_name || 'Your Contractor'} — ${inv.invoice_number}`,
+      body: `Hi ${inv.client_name || 'there'},\n\nPlease find your invoice here:\n${link}\n\nTotal Due: $${(inv.total||0).toFixed(2)}\nDue Date: ${inv.due_date || 'Upon receipt'}\n\nThank you for your business!\n${profile?.business_name || ''}\n${profile?.phone || ''}`,
+    }
+  }
+
+  const mailtoFallback = (inv) => {
+    const m = buildInvoiceEmail(inv)
+    window.open(`mailto:${m.to}?subject=${encodeURIComponent(m.subject)}&body=${encodeURIComponent(m.body)}`)
   }
 
   const totalOwed = invoices.filter(i => i.status !== 'Paid').reduce((s,i) => s+(i.total||0), 0)
@@ -232,7 +241,7 @@ export default function Invoices() {
                   <button onClick={() => downloadInvoicePdf(inv)} disabled={pdfingId === inv.id} title="Download PDF" className="btn-ghost text-xs py-1 px-2">
                     <Download size={14} /> {pdfingId === inv.id ? 'Preparing…' : 'PDF'}
                   </button>
-                  <button onClick={() => emailInvoice(inv)} title="Email invoice" className="btn-ghost text-xs py-1 px-2">
+                  <button onClick={() => setEmailOpen(inv)} title="Email invoice" className="btn-ghost text-xs py-1 px-2">
                     <Mail size={14} /> Email
                   </button>
                   {inv.status === 'Paid' && (
@@ -250,6 +259,21 @@ export default function Invoices() {
           )
         })}
       </div>
+
+      {emailOpen && (() => {
+        const m = buildInvoiceEmail(emailOpen)
+        return (
+          <EmailModal
+            open
+            onClose={() => setEmailOpen(null)}
+            initialTo={m.to}
+            initialSubject={m.subject}
+            initialBody={m.body}
+            kind="invoice"
+            mailtoFallback={() => mailtoFallback(emailOpen)}
+          />
+        )
+      })()}
     </div>
   )
 }
