@@ -145,7 +145,7 @@ export default function Dashboard() {
             <div className="flex items-center gap-2 mb-2">
               <AlertTriangle size={16} className="text-red-500" />
               <h3 className="font-semibold">Overdue Invoices</h3>
-              <span className="badge bg-red-100 text-red-700">{overdue.length}</span>
+              <span className="badge-danger">{overdue.length}</span>
             </div>
             <div className="space-y-1">
               {overdue.slice(0, 3).map(inv => (
@@ -164,7 +164,7 @@ export default function Dashboard() {
             <div className="flex items-center gap-2 mb-2">
               <Clock size={16} className="text-yellow-500" />
               <h3 className="font-semibold">Pending Change Orders</h3>
-              <span className="badge bg-yellow-100 text-yellow-700">{pendingCOs}</span>
+              <span className="badge-warning">{pendingCOs}</span>
             </div>
             <p className="text-sm text-gray-500">Awaiting approval across your projects</p>
             <Link to="/projects" className="text-xs text-brand-600 hover:underline mt-2 inline-flex items-center gap-1">Review <ArrowRight size={11} /></Link>
@@ -176,7 +176,7 @@ export default function Dashboard() {
             <div className="flex items-center gap-2 mb-2">
               <FileText size={16} className="text-blue-500" />
               <h3 className="font-semibold">Estimates Awaiting Signature</h3>
-              <span className="badge bg-blue-100 text-blue-700">{unsigned}</span>
+              <span className="badge-accent">{unsigned}</span>
             </div>
             <p className="text-sm text-gray-500">Follow up with clients who haven't signed yet</p>
             <Link to="/estimates" className="text-xs text-brand-600 hover:underline mt-2 inline-flex items-center gap-1">View <ArrowRight size={11} /></Link>
@@ -188,7 +188,7 @@ export default function Dashboard() {
             <div className="flex items-center gap-2 mb-2">
               <Users size={16} className="text-green-500" />
               <h3 className="font-semibold">New Leads</h3>
-              <span className="badge bg-green-100 text-green-700">{newLeads}</span>
+              <span className="badge-success">{newLeads}</span>
             </div>
             <p className="text-sm text-gray-500">Reach out before they go cold</p>
             <Link to="/leads" className="text-xs text-brand-600 hover:underline mt-2 inline-flex items-center gap-1">View <ArrowRight size={11} /></Link>
@@ -213,7 +213,7 @@ export default function Dashboard() {
                     <div className="font-medium">{p.name}</div>
                     <div className="text-xs text-gray-500">{p.client || '—'} · {new Date(p.start_date).toLocaleDateString()}</div>
                   </div>
-                  <span className="badge bg-gray-100 text-gray-600 text-xs">{p.status}</span>
+                  <span className="badge-info text-xs">{p.status}</span>
                 </Link>
               ))}
             </div>
@@ -236,7 +236,7 @@ export default function Dashboard() {
                     <div className="text-xs text-gray-500">{inv.invoice_number} · {new Date(inv.created_at).toLocaleDateString()}</div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className={`badge ${inv.status === 'Paid' ? 'bg-green-100 text-green-700' : inv.status === 'Overdue' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-600'}`}>{inv.status}</span>
+                    <span className={inv.status === 'Paid' ? 'badge-success' : inv.status === 'Overdue' ? 'badge-danger' : 'badge-info'}>{inv.status}</span>
                     <span className="font-bold">${(inv.total || 0).toFixed(0)}</span>
                   </div>
                 </div>

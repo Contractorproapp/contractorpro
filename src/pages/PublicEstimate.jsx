@@ -73,7 +73,7 @@ export default function PublicEstimate() {
           </div>
           <div className="text-right">
             <p className="text-xs text-gray-400 uppercase tracking-wide">Estimate</p>
-            {est.signed_at && <span className="badge bg-green-100 text-green-700 mt-1"><CheckCircle2 size={12} /> Signed</span>}
+            {est.signed_at && <span className="badge-success mt-1"><CheckCircle2 size={12} /> Signed</span>}
           </div>
         </div>
 

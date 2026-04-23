@@ -4,8 +4,8 @@ import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 
 const STATUS_COLORS = {
-  Planning:'bg-gray-100 text-gray-600', 'In Progress':'bg-blue-100 text-blue-700',
-  Punch_List:'bg-yellow-100 text-yellow-700', Complete:'bg-green-100 text-green-700', 'On Hold':'bg-orange-100 text-orange-700',
+  Planning:'badge-info', 'In Progress':'badge-accent',
+  Punch_List:'badge-warning', Complete:'badge-success', 'On Hold':'badge-warning',
 }
 const uid = () => Math.random().toString(36).slice(2)
 
@@ -144,7 +144,7 @@ export default function Projects() {
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <span className={`badge ${STATUS_COLORS[proj.status] || STATUS_COLORS.Planning}`}>{proj.status}</span>
+                <span className={STATUS_COLORS[proj.status] || STATUS_COLORS.Planning}>{proj.status}</span>
                 {openId===proj.id ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
               </div>
             </button>
@@ -166,7 +166,7 @@ export default function Projects() {
                   <div className="flex items-center gap-2 mb-2">
                     <FileText size={14} className="text-gray-400" />
                     <span className="text-sm font-semibold text-gray-700">Field Notes</span>
-                    <span className="badge bg-gray-100 text-gray-500">{(proj.notes||[]).length}</span>
+                    <span className="badge-info">{(proj.notes||[]).length}</span>
                   </div>
                   <div className="flex gap-2 mb-2">
                     <input className="input text-sm" placeholder="Add a field note…"
@@ -191,7 +191,7 @@ export default function Projects() {
                   <div className="flex items-center gap-2 mb-2">
                     <Camera size={14} className="text-gray-400" />
                     <span className="text-sm font-semibold text-gray-700">Job Photos</span>
-                    <span className="badge bg-gray-100 text-gray-500">{(proj.photos||[]).length}</span>
+                    <span className="badge-info">{(proj.photos||[]).length}</span>
                   </div>
                   <label className="btn-ghost text-xs py-1.5 cursor-pointer inline-flex mb-2">
                     <Camera size={13} /> Add Photo
@@ -219,7 +219,7 @@ export default function Projects() {
                   <div className="flex items-center gap-2 mb-2">
                     <AlertTriangle size={14} className="text-yellow-500" />
                     <span className="text-sm font-semibold text-gray-700">Change Orders</span>
-                    <span className="badge bg-yellow-100 text-yellow-700">{(proj.change_orders||[]).filter(c => c.status==='Pending').length} pending</span>
+                    <span className="badge-warning">{(proj.change_orders||[]).filter(c => c.status==='Pending').length} pending</span>
                   </div>
                   <div className="flex gap-2 mb-2">
                     <input className="input text-sm" placeholder="Describe the change order…"
@@ -234,7 +234,7 @@ export default function Projects() {
                       <div key={co.id} className="flex items-start justify-between gap-3 bg-yellow-50 rounded-lg px-3 py-2">
                         <div><p className="text-sm text-gray-700">{co.text}</p><p className="text-xs text-gray-400">{co.date}</p></div>
                         <button onClick={() => toggleCOStatus(proj.id, co.id)}
-                          className={`badge shrink-0 cursor-pointer ${co.status==='Approved' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                          className={`shrink-0 cursor-pointer ${co.status==='Approved' ? 'badge-success' : 'badge-warning'}`}>
                           {co.status}
                         </button>
                       </div>

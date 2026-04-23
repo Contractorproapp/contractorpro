@@ -47,7 +47,7 @@ export default function PublicInvoice() {
     </div>
   )
 
-  const STATUS_COLORS = { Draft:'bg-gray-100 text-gray-600', Sent:'bg-blue-100 text-blue-700', Paid:'bg-green-100 text-green-700', Overdue:'bg-red-100 text-red-600' }
+  const STATUS_COLORS = { Draft:'badge-info', Sent:'badge-accent', Paid:'badge-success', Overdue:'badge-danger' }
 
   return (
     <div className="min-h-screen bg-gray-50 py-10 px-4 print:bg-white print:py-0">
@@ -78,7 +78,7 @@ export default function PublicInvoice() {
           <div className="text-right">
             <p className="text-xs text-gray-400 uppercase tracking-wide">Invoice</p>
             <p className="font-mono font-bold text-lg">{invoice.invoice_number}</p>
-            <span className={`badge mt-1 ${STATUS_COLORS[invoice.status] || STATUS_COLORS.Draft}`}>{invoice.status}</span>
+            <span className={`mt-1 ${STATUS_COLORS[invoice.status] || STATUS_COLORS.Draft}`}>{invoice.status}</span>
           </div>
         </div>
 

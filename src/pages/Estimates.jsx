@@ -42,7 +42,7 @@ function EstimateCard({ est, onDelete }) {
   const [open, setOpen] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [copied, setCopied] = useState(false)
-  const statusColors = { Draft:'bg-gray-100 text-gray-600', Sent:'bg-blue-100 text-blue-700', Accepted:'bg-green-100 text-green-700', Declined:'bg-red-100 text-red-700' }
+  const statusColors = { Draft:'badge-info', Sent:'badge-accent', Accepted:'badge-success', Declined:'badge-danger' }
 
   const handleDelete = async () => {
     setDeleting(true)
@@ -66,8 +66,8 @@ function EstimateCard({ est, onDelete }) {
           </div>
         </div>
         <div className="flex items-center gap-3">
-          {est.signed_at && <span className="badge bg-green-100 text-green-700"><CheckCircle2 size={12} /> Signed</span>}
-          <span className={`badge ${statusColors[est.status] || statusColors.Draft}`}>{est.status}</span>
+          {est.signed_at && <span className="badge-success"><CheckCircle2 size={12} /> Signed</span>}
+          <span className={statusColors[est.status] || statusColors.Draft}>{est.status}</span>
           <span className="font-bold text-brand-600">${(est.total || 0).toFixed(2)}</span>
           {open ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
         </div>

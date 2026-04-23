@@ -4,8 +4,8 @@ import { Loader2, Hammer, FileText, AlertTriangle, Download } from 'lucide-react
 import { supabase } from '../lib/supabase'
 
 const STATUS_COLORS = {
-  Planning:'bg-gray-100 text-gray-600', 'In Progress':'bg-blue-100 text-blue-700',
-  Punch_List:'bg-yellow-100 text-yellow-700', Complete:'bg-green-100 text-green-700', 'On Hold':'bg-orange-100 text-orange-700',
+  Planning:'badge-info', 'In Progress':'badge-accent',
+  Punch_List:'badge-warning', Complete:'badge-success', 'On Hold':'badge-warning',
 }
 
 export default function PublicProject() {
@@ -72,7 +72,7 @@ export default function PublicProject() {
               {profile?.phone && <p className="text-sm text-gray-500">{profile.phone}</p>}
             </div>
           </div>
-          <span className={`badge mt-1 ${STATUS_COLORS[project.status] || STATUS_COLORS.Planning}`}>{project.status}</span>
+          <span className={`mt-1 ${STATUS_COLORS[project.status] || STATUS_COLORS.Planning}`}>{project.status}</span>
         </div>
 
         {/* Project Info */}
@@ -127,7 +127,7 @@ export default function PublicProject() {
               {(project.change_orders||[]).map(co => (
                 <div key={co.id} className="flex items-start justify-between gap-3 bg-yellow-50 rounded-lg px-3 py-2">
                   <div><p className="text-sm text-gray-700">{co.text}</p><p className="text-xs text-gray-400">{co.date}</p></div>
-                  <span className={`badge shrink-0 ${co.status==='Approved' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>{co.status}</span>
+                  <span className={`shrink-0 ${co.status==='Approved' ? 'badge-success' : 'badge-warning'}`}>{co.status}</span>
                 </div>
               ))}
             </div>
