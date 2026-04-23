@@ -66,7 +66,7 @@ export default function Clients() {
   return (
     <div className="max-w-5xl mx-auto space-y-6 pt-14 lg:pt-0">
       <div>
-        <h1 className="text-2xl font-bold">Clients</h1>
+        <h1 className="page-title">Clients</h1>
         <p className="text-gray-500 text-sm mt-0.5">Everyone you've worked with in one place</p>
       </div>
 

@@ -11,11 +11,12 @@ import OnboardingChecklist from '../components/OnboardingChecklist'
 const IRS_MILEAGE_RATE = 0.67
 const DAY_MS = 24 * 60 * 60 * 1000
 
-function StatCard({ label, value, sub, color = 'text-gray-800' }) {
+function StatCard({ label, value, sub, color = 'text-gray-900', accent }) {
   return (
-    <div className="card p-4">
-      <div className="text-xs text-gray-500 uppercase tracking-wide">{label}</div>
-      <div className={`text-2xl font-bold mt-1 ${color}`}>{value}</div>
+    <div className="stat relative overflow-hidden">
+      {accent && <div className={`absolute top-0 left-0 right-0 h-1 ${accent}`} />}
+      <div className="stat-label">{label}</div>
+      <div className={`stat-value ${color}`}>{value}</div>
       {sub && <div className="text-xs text-gray-400 mt-1">{sub}</div>}
     </div>
   )
@@ -119,9 +120,11 @@ export default function Dashboard() {
 
   return (
     <div className="max-w-5xl mx-auto space-y-6 pt-14 lg:pt-0">
-      <div>
-        <h1 className="text-2xl font-bold">{hi}, {firstName}</h1>
-        <p className="text-gray-500 text-sm mt-0.5">Here's what needs attention today</p>
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">{hi}, {firstName}</h1>
+          <p className="page-subtitle">Here's what needs attention today</p>
+        </div>
       </div>
 
       <OnboardingChecklist profile={profile} counts={{
@@ -132,10 +135,10 @@ export default function Dashboard() {
 
       {/* Money stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <StatCard label="Outstanding" value={`$${outstanding.toFixed(0)}`} color="text-red-600" sub={`${data.invoices.filter(i => i.status !== 'Paid').length} unpaid`} />
-        <StatCard label="Collected" value={`$${collected.toFixed(0)}`} color="text-green-600" sub={`${data.invoices.filter(i => i.status === 'Paid').length} paid`} />
-        <StatCard label="YTD Expenses" value={`$${derived.ytdExpenses.toFixed(0)}`} sub={`${derived.ytdMiles.toFixed(0)} mi logged`} />
-        <StatCard label="Mileage Deduction" value={`$${derived.mileageDeduction.toFixed(0)}`} color="text-green-600" sub={`@ $${IRS_MILEAGE_RATE}/mi`} />
+        <StatCard label="Outstanding" value={`$${outstanding.toFixed(0)}`} color="text-red-600" accent="bg-red-500" sub={`${data.invoices.filter(i => i.status !== 'Paid').length} unpaid`} />
+        <StatCard label="Collected" value={`$${collected.toFixed(0)}`} color="text-green-600" accent="bg-green-500" sub={`${data.invoices.filter(i => i.status === 'Paid').length} paid`} />
+        <StatCard label="YTD Expenses" value={`$${derived.ytdExpenses.toFixed(0)}`} accent="bg-gray-300" sub={`${derived.ytdMiles.toFixed(0)} mi logged`} />
+        <StatCard label="Mileage Deduction" value={`$${derived.mileageDeduction.toFixed(0)}`} color="text-brand-600" accent="bg-brand-500" sub={`@ $${IRS_MILEAGE_RATE}/mi`} />
       </div>
 
       {/* Action items */}
@@ -251,8 +254,10 @@ export default function Dashboard() {
         <h3 className="font-semibold mb-3">Jump to</h3>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {navTiles.map(({ to, icon: Icon, label, count, sub }) => (
-            <Link key={to} to={to} className="card p-4 hover:bg-gray-50 hover:shadow-md transition-all">
-              <Icon size={20} className="text-brand-500 mb-2" />
+            <Link key={to} to={to} className="card-hover p-4 group">
+              <div className="w-9 h-9 rounded-lg bg-brand-50 text-brand-600 flex items-center justify-center mb-3 group-hover:bg-brand-100 transition-colors">
+                <Icon size={18} />
+              </div>
               <div className="text-sm font-semibold">{label}</div>
               {count !== null && (
                 <div className="text-xs text-gray-400 mt-0.5">

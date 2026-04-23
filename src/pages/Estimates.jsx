@@ -166,7 +166,7 @@ Subtotal: $${subtotal.toFixed(2)} | Total with markup: $${total.toFixed(2)}`
     <div className="max-w-4xl mx-auto space-y-6 pt-14 lg:pt-0">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Estimates</h1>
+          <h1 className="page-title">Estimates</h1>
           <p className="text-gray-500 text-sm mt-0.5">Generate professional quotes in seconds</p>
         </div>
         <button onClick={() => setShowForm(f => !f)} className="btn-primary"><Plus size={16} /> New Estimate</button>

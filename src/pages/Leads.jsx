@@ -77,7 +77,7 @@ Message type: ${followUpType}`
     <div className="max-w-4xl mx-auto space-y-6 pt-14 lg:pt-0">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Leads & Follow-ups</h1>
+          <h1 className="page-title">Leads & Follow-ups</h1>
           <p className="text-gray-500 text-sm mt-0.5">Never let a lead go cold again</p>
         </div>
         <button onClick={() => setShowForm(f => !f)} className="btn-primary"><Plus size={16} /> Add Lead</button>

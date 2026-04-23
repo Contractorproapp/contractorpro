@@ -63,7 +63,7 @@ export default function Marketing() {
   return (
     <div className="max-w-3xl mx-auto space-y-6 pt-14 lg:pt-0">
       <div>
-        <h1 className="text-2xl font-bold">Marketing Copy</h1>
+        <h1 className="page-title">Marketing Copy</h1>
         <p className="text-gray-500 text-sm mt-0.5">Professional content for your business — written in seconds</p>
       </div>
 

@@ -128,7 +128,7 @@ export default function Expenses() {
     <div className="max-w-5xl mx-auto space-y-6 pt-14 lg:pt-0">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-bold">Expenses & Mileage</h1>
+          <h1 className="page-title">Expenses & Mileage</h1>
           <p className="text-gray-500 text-sm mt-0.5">Track write-offs and export for taxes</p>
         </div>
         <div className="flex items-center gap-2">

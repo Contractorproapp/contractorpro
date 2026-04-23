@@ -121,7 +121,7 @@ export default function Calendar() {
       <div className="sticky top-0 lg:top-0 z-20 bg-white/95 backdrop-blur pb-3 -mx-4 px-4 lg:mx-0 lg:px-0 border-b lg:border-0">
         <div className="flex items-center justify-between flex-wrap gap-3 pt-2">
           <div>
-            <h1 className="text-2xl font-bold">Calendar</h1>
+            <h1 className="page-title">Calendar</h1>
             <p className="text-gray-500 text-xs mt-0.5 hidden sm:block">
               Shortcuts: <kbd className="px-1 bg-gray-100 rounded text-[10px]">←</kbd> <kbd className="px-1 bg-gray-100 rounded text-[10px]">→</kbd> nav · <kbd className="px-1 bg-gray-100 rounded text-[10px]">T</kbd> today · <kbd className="px-1 bg-gray-100 rounded text-[10px]">W</kbd>/<kbd className="px-1 bg-gray-100 rounded text-[10px]">M</kbd> view
             </p>

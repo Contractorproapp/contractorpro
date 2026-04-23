@@ -100,7 +100,7 @@ export default function Projects() {
     <div className="max-w-4xl mx-auto space-y-6 pt-14 lg:pt-0">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Projects</h1>
+          <h1 className="page-title">Projects</h1>
           <p className="text-gray-500 text-sm mt-0.5">Notes, change orders, and job documentation</p>
         </div>
         <button onClick={() => setShowForm(f => !f)} className="btn-primary"><Plus size={16} /> New Project</button>
