@@ -45,7 +45,7 @@ function AppShell({ children }) {
   return (
     <div className="flex min-h-screen">
       <Sidebar />
-      <main className="flex-1 p-4 lg:p-8 pb-20 lg:pb-8 overflow-y-auto">
+      <main className="flex-1 p-4 lg:p-8 pb-20 lg:pb-8 lg:pt-20 overflow-y-auto">
         {children}
       </main>
       <MobileTabs onMore={() => window.dispatchEvent(new CustomEvent('open-mobile-drawer'))} />

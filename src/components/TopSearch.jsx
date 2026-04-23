@@ -1,15 +1,18 @@
 import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { Search } from 'lucide-react'
+import { useAuth } from '../contexts/AuthContext'
 
 export default function TopSearch() {
   const location = useLocation()
+  const { user } = useAuth()
   const [isMac, setIsMac] = useState(false)
 
   useEffect(() => {
     setIsMac(/Mac|iPhone|iPad/.test(navigator.platform))
   }, [])
 
+  if (!user) return null
   const hideOn = ['/login', '/signup', '/onboarding', '/subscribe', '/privacy', '/terms']
   if (hideOn.some(p => location.pathname.startsWith(p))) return null
   if (location.pathname.startsWith('/invoice/') || location.pathname.startsWith('/estimate/') || location.pathname.startsWith('/project/')) return null

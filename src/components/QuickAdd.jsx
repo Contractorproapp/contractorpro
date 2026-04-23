@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { Plus, X, FileText, Receipt, Users, FolderOpen, Car } from 'lucide-react'
+import { useAuth } from '../contexts/AuthContext'
 
 const ITEMS = [
   { to: '/estimates', Icon: FileText,   label: 'Estimate',  color: 'bg-blue-500' },
@@ -13,6 +14,7 @@ const ITEMS = [
 export default function QuickAdd() {
   const navigate = useNavigate()
   const location = useLocation()
+  const { user } = useAuth()
   const [open, setOpen] = useState(false)
 
   useEffect(() => {
@@ -23,6 +25,7 @@ export default function QuickAdd() {
     return () => window.removeEventListener('keydown', onKey)
   }, [open])
 
+  if (!user) return null
   const hideOn = ['/login', '/signup', '/onboarding', '/subscribe', '/privacy', '/terms']
   if (hideOn.some(p => location.pathname.startsWith(p))) return null
   if (location.pathname.startsWith('/invoice/') || location.pathname.startsWith('/estimate/') || location.pathname.startsWith('/project/')) return null
