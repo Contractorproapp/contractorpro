@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Save, Upload, Eye, EyeOff, CheckCircle2, Loader2, ExternalLink, CreditCard } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
+import { useToast } from '../components/Toast'
 
 const DAILY_LIMIT = 350
 
@@ -35,6 +36,7 @@ function AiUsageCard() {
 
 export default function Profile() {
   const { user, profile, refreshProfile } = useAuth()
+  const toast = useToast()
   const [businessName, setBusinessName] = useState('')
   const [phone, setPhone]               = useState('')
   const [reviewUrl, setReviewUrl]       = useState('')
@@ -98,7 +100,7 @@ export default function Profile() {
     // Redirect to Stripe Customer Portal
     const { data, error } = await supabase.functions.invoke('customer-portal', { body: { user_id: user.id } })
     if (data?.url) window.open(data.url, '_blank')
-    else alert(error?.message || 'Could not open billing portal')
+    else toast.error(error?.message || 'Could not open billing portal')
   }
 
   return (

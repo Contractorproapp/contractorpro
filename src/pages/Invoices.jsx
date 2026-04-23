@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Plus, Trash2, Receipt, AlertCircle, CheckCircle2, Clock, Link, Mail, Loader2, Star } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
+import { useToast } from '../components/Toast'
 
 const STATUS_COLORS = { Draft:'bg-gray-100 text-gray-600', Sent:'bg-blue-100 text-blue-700', Paid:'bg-green-100 text-green-700', Overdue:'bg-red-100 text-red-700' }
 const STATUS_ICONS  = { Draft:Clock, Sent:AlertCircle, Paid:CheckCircle2, Overdue:AlertCircle }
@@ -101,6 +102,7 @@ function InvoiceForm({ userId, onSave, onCancel }) {
 
 export default function Invoices() {
   const { user, profile } = useAuth()
+  const toast = useToast()
   const [invoices, setInvoices] = useState([])
   const [fetching, setFetching] = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -130,7 +132,7 @@ export default function Invoices() {
 
   const requestReview = (inv) => {
     const url = profile?.google_review_url
-    if (!url) { alert('Add your Google Review link in Profile & Settings first.'); return }
+    if (!url) { toast.error('Add your Google Review link in Profile & Settings first.'); return }
     const msg = encodeURIComponent(`Hi ${inv.client_name || 'there'}, thanks so much for your business! If you were happy with the work, would you leave us a quick review? It really helps. ${url}\n\n— ${profile?.business_name || ''}`)
     window.open(`sms:${inv.client_phone || ''}?&body=${msg}`)
   }

@@ -2,12 +2,14 @@ import { useState, useEffect, useMemo } from 'react'
 import { Plus, Trash2, Download, Upload, Car, Receipt as ReceiptIcon, Loader2, X, Info } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
+import { useToast } from '../components/Toast'
 
 const CATEGORIES = ['Materials', 'Tools', 'Fuel', 'Subcontractor', 'Permits', 'Insurance', 'Vehicle', 'Office', 'Other']
 const IRS_MILEAGE_RATE = 0.67
 
 export default function Expenses() {
   const { user } = useAuth()
+  const toast = useToast()
   const [tab, setTab] = useState('expenses')
   const [expenses, setExpenses] = useState([])
   const [mileage, setMileage] = useState([])
@@ -48,7 +50,7 @@ export default function Expenses() {
     const ext = file.name.split('.').pop()
     const path = `${user.id}/${Date.now()}.${ext}`
     const { error } = await supabase.storage.from('receipts').upload(path, file)
-    if (error) { alert(error.message); setUploading(false); return }
+    if (error) { toast.error(error.message); setUploading(false); return }
     const { data } = supabase.storage.from('receipts').getPublicUrl(path)
     setEForm(f => ({ ...f, receipt_url: data.publicUrl }))
     setUploading(false)

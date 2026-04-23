@@ -4,6 +4,8 @@ import { supabase } from '../lib/supabase'
 import { streamClaude } from '../lib/claude'
 import { useAuth } from '../contexts/AuthContext'
 import AiOutput from '../components/AiOutput'
+import { formatPhone } from '../lib/format'
+import EmptyState from '../components/EmptyState'
 
 const SYSTEM = `You are a contractor business assistant. Write short, professional, warm follow-up messages for contractors to send to leads and past clients. Sound like a real person — brief, warm, clear call to action.`
 
@@ -95,7 +97,7 @@ Message type: ${followUpType}`
             </div>
             <div>
               <label className="label">Phone</label>
-              <input className="input" placeholder="(555) 123-4567" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} />
+              <input className="input" placeholder="(555) 123-4567" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: formatPhone(e.target.value) }))} />
             </div>
             <div>
               <label className="label">Email</label>
@@ -116,10 +118,12 @@ Message type: ${followUpType}`
       <div className="space-y-3">
         {fetching && <div className="flex justify-center py-8"><Loader2 size={24} className="animate-spin text-gray-400" /></div>}
         {!fetching && leads.length === 0 && (
-          <div className="text-center py-12 text-gray-400">
-            <User size={40} className="mx-auto mb-3 opacity-40" />
-            <p className="text-sm">No leads yet. Add your first one above.</p>
-          </div>
+          <EmptyState
+            icon={User}
+            title="No leads yet"
+            description="Track people who reached out but haven't signed. Add one to see AI-generated follow-up messages."
+            action={<button onClick={() => setShowForm(true)} className="btn-primary"><Plus size={15} /> Add your first lead</button>}
+          />
         )}
         {leads.map(lead => (
           <div key={lead.id} className="card p-4">

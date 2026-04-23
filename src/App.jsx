@@ -3,6 +3,8 @@ import { AuthProvider } from './contexts/AuthContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import Sidebar from './components/Sidebar'
 import UsageWarning from './components/UsageWarning'
+import { ToastProvider } from './components/Toast'
+import KeyboardShortcuts from './components/KeyboardShortcuts'
 
 import Login               from './pages/Login'
 import Signup              from './pages/Signup'
@@ -49,8 +51,10 @@ function AppShell({ children }) {
 export default function App() {
   return (
     <AuthProvider>
+      <ToastProvider>
       <UsageWarning />
       <BrowserRouter>
+        <KeyboardShortcuts />
         <Routes>
           {/* Public auth routes */}
           <Route path="/login"    element={<Login />} />
@@ -117,6 +121,7 @@ export default function App() {
           } />
         </Routes>
       </BrowserRouter>
+      </ToastProvider>
     </AuthProvider>
   )
 }
