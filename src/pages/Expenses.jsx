@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
-import { Plus, Trash2, Download, Upload, Car, Receipt as ReceiptIcon, Loader2, X } from 'lucide-react'
+import { Plus, Trash2, Download, Upload, Car, Receipt as ReceiptIcon, Loader2, X, Info } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 
@@ -149,7 +149,23 @@ export default function Expenses() {
       <div className="grid grid-cols-3 gap-3">
         <div className="card p-4"><div className="text-xs text-gray-500 uppercase">{year} Expenses</div><div className="text-xl font-bold mt-1">${expenseTotal.toFixed(0)}</div></div>
         <div className="card p-4"><div className="text-xs text-gray-500 uppercase">Miles</div><div className="text-xl font-bold mt-1">{milesTotal.toFixed(0)}</div></div>
-        <div className="card p-4"><div className="text-xs text-gray-500 uppercase">Mileage Deduction</div><div className="text-xl font-bold mt-1 text-green-600">${mileageDeduction.toFixed(0)}</div><div className="text-xs text-gray-400 mt-0.5">@ ${IRS_MILEAGE_RATE}/mi</div></div>
+        <div className="card p-4">
+          <div className="text-xs text-gray-500 uppercase">Est. Mileage Deduction</div>
+          <div className="text-xl font-bold mt-1 text-green-600">${mileageDeduction.toFixed(0)}</div>
+          <div className="text-xs text-gray-400 mt-0.5">@ ${IRS_MILEAGE_RATE}/mi · estimate</div>
+        </div>
+      </div>
+
+      <div className="card p-4 bg-blue-50/50 border-blue-100">
+        <div className="flex items-start gap-3">
+          <Info size={16} className="text-blue-500 shrink-0 mt-0.5" />
+          <div className="text-xs text-gray-600 space-y-1.5">
+            <p><strong className="text-gray-800">How mileage deductions work.</strong> The IRS lets you deduct ${IRS_MILEAGE_RATE} per business mile (2024–2026 standard rate). The number above multiplies your logged miles by that rate — it reduces your <em>taxable income</em>, not your tax bill directly. Actual savings depend on your tax bracket (typically 15–30% of the deduction).</p>
+            <p><strong className="text-gray-800">What counts:</strong> driving to job sites, supplier runs, estimates, client meetings. <strong className="text-gray-800">What doesn't:</strong> commuting from home to your regular shop, personal trips.</p>
+            <p><strong className="text-gray-800">For accurate logs:</strong> enter trips as they happen — the IRS requires contemporaneous records.</p>
+            <p className="text-gray-500 italic pt-1 border-t border-blue-100">This is an estimate, not tax advice. Consult a CPA or tax professional before filing.</p>
+          </div>
+        </div>
       </div>
 
       <div className="flex gap-2 border-b">
