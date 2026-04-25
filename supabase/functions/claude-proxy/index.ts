@@ -1,8 +1,14 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? ''
 const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY') ?? ''
 const SUPABASE_SERVICE_ROLE = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+
+// Use the service-role client for JWT verification — this works regardless
+// of whether the project signs JWTs with HS256 (legacy) or ES256 (new
+// asymmetric default), because verification goes through Supabase's auth
+// server which holds the right verification keys.
+const adminAuth = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE)
 
 const DAILY_LIMIT = 350
 
@@ -24,15 +30,19 @@ Deno.serve(async (req) => {
   try {
     const authHeader = req.headers.get('Authorization')
     if (!authHeader) return json({ error: 'Missing auth' }, 401)
+    const token = authHeader.replace(/^Bearer\s+/i, '')
 
-    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      global: { headers: { Authorization: authHeader } },
-    })
+    // Verify JWT via service-role client. Pass the token explicitly so the
+    // SDK calls Supabase's /auth/v1/user endpoint to verify — this works
+    // for both HS256 and ES256 (asymmetric) signing algorithms.
+    const { data: { user }, error: authErr } = await adminAuth.auth.getUser(token)
+    if (authErr || !user) {
+      return json({ error: `Unauthorized: ${authErr?.message || 'invalid session'}` }, 401)
+    }
 
-    const { data: { user }, error: authErr } = await supabase.auth.getUser()
-    if (authErr || !user) return json({ error: 'Unauthorized' }, 401)
-
-    const { data: profile } = await supabase
+    // Use service-role client for the profile read — bypasses RLS but we've
+    // already verified the user identity above and only read THEIR row.
+    const { data: profile } = await adminAuth
       .from('profiles').select('claude_api_key, subscription_status').eq('id', user.id).single()
 
     if (!profile?.claude_api_key) return json({ error: 'No Claude API key set in profile' }, 400)
@@ -41,8 +51,8 @@ Deno.serve(async (req) => {
       return json({ error: 'Subscription required' }, 402)
     }
 
-    // Service-role client for usage table writes
-    const admin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE)
+    // Reuse the service-role client for usage tracking
+    const admin = adminAuth
 
     const { data: usedToday } = await admin.rpc('ai_usage_today', { uid: user.id })
     const used = usedToday ?? 0

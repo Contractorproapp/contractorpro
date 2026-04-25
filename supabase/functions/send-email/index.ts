@@ -1,8 +1,13 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? ''
 const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY') ?? ''
 const SUPABASE_SERVICE_ROLE = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+
+// Service-role client used for both JWT verification (via auth.getUser(token))
+// and DB reads. Works for HS256 + ES256 signing because verification runs
+// against Supabase's auth server, not locally.
+const adminAuth = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE)
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY') ?? ''
 const RESEND_FROM_EMAIL = Deno.env.get('RESEND_FROM_EMAIL') ?? ''
 
@@ -42,15 +47,15 @@ Deno.serve(async (req) => {
 
     const authHeader = req.headers.get('Authorization')
     if (!authHeader) return json({ error: 'Missing auth' }, 401)
+    const token = authHeader.replace(/^Bearer\s+/i, '')
 
-    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      global: { headers: { Authorization: authHeader } },
-    })
+    // Verify JWT via service-role client (handles HS256 + ES256)
+    const { data: { user }, error: authErr } = await adminAuth.auth.getUser(token)
+    if (authErr || !user) {
+      return json({ error: `Unauthorized: ${authErr?.message || 'invalid session'}` }, 401)
+    }
 
-    const { data: { user }, error: authErr } = await supabase.auth.getUser()
-    if (authErr || !user) return json({ error: 'Unauthorized' }, 401)
-
-    const { data: profile } = await supabase
+    const { data: profile } = await adminAuth
       .from('profiles').select('business_name, subscription_status').eq('id', user.id).single()
 
     if (profile?.subscription_status !== 'active' && profile?.subscription_status !== 'trialing') {
