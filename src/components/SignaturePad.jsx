@@ -13,9 +13,9 @@ export default function SignaturePad({ onChange }) {
     canvas.height = canvas.offsetHeight * ratio
     const ctx = canvas.getContext('2d')
     ctx.scale(ratio, ratio)
-    ctx.lineWidth = 2
-    ctx.lineCap = 'round'
-    ctx.strokeStyle = '#111827'
+    ctx.lineWidth   = 2
+    ctx.lineCap     = 'round'
+    ctx.strokeStyle = '#0F172A' // steel-900 — public estimate is always light
   }, [])
 
   const pos = (e) => {
@@ -59,7 +59,7 @@ export default function SignaturePad({ onChange }) {
 
   return (
     <div className="space-y-2">
-      <div className="relative border-2 border-dashed border-gray-300 rounded-lg bg-white">
+      <div className="relative border-2 border-dashed border-steel-300 rounded-lg bg-white">
         <canvas
           ref={canvasRef}
           onMouseDown={start} onMouseMove={draw} onMouseUp={end} onMouseLeave={end}
@@ -67,12 +67,17 @@ export default function SignaturePad({ onChange }) {
           className="w-full h-40 touch-none cursor-crosshair"
         />
         {empty && (
-          <div className="absolute inset-0 flex items-center justify-center text-gray-300 text-sm pointer-events-none">
+          <div className="absolute inset-0 flex items-center justify-center text-steel-400 text-sm pointer-events-none stamp-label">
             Sign here
           </div>
         )}
       </div>
-      <button onClick={clear} className="btn-ghost text-xs py-1"><Eraser size={12} /> Clear</button>
+      <button
+        onClick={clear}
+        className="inline-flex items-center gap-1 text-xs font-semibold text-steel-600 hover:text-steel-900 transition-colors cursor-pointer"
+      >
+        <Eraser size={12} /> Clear
+      </button>
     </div>
   )
 }

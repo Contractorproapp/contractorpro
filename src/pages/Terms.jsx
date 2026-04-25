@@ -2,10 +2,12 @@ import { Link } from 'react-router-dom'
 
 export default function Terms() {
   return (
-    <div className="max-w-3xl mx-auto px-6 py-12 text-gray-800">
-      <Link to="/" className="text-brand-600 text-sm hover:underline">← Back</Link>
-      <h1 className="text-3xl font-bold mt-4 mb-2">Terms of Service</h1>
-      <p className="text-sm text-gray-500 mb-8">Last updated: April 21, 2026</p>
+    <div className="min-h-screen bg-background text-foreground">
+    <div className="max-w-3xl mx-auto px-6 py-12">
+      <Link to="/" className="text-brand-600 dark:text-brand-400 text-sm font-semibold hover:underline">← Back</Link>
+      <p className="stamp-label text-brand-600 dark:text-brand-400 mt-6">// Legal</p>
+      <h1 className="font-display font-bold text-3xl tracking-tight mt-2 mb-2">Terms of Service</h1>
+      <p className="text-sm text-muted-foreground mb-8">Last updated: April 21, 2026</p>
 
       <div className="prose prose-sm max-w-none space-y-6">
         <section>
@@ -74,6 +76,7 @@ export default function Terms() {
           <p>Questions: <a href="mailto:Contractorproapp@proton.me" className="text-brand-600 hover:underline">Contractorproapp@proton.me</a></p>
         </section>
       </div>
+    </div>
     </div>
   )
 }
