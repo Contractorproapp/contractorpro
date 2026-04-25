@@ -41,7 +41,12 @@ export function AuthProvider({ children }) {
     supabase.auth.signInWithPassword({ email, password })
 
   const signInWithGoogle = () =>
-    supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: `${window.location.origin}/onboarding` } })
+    supabase.auth.signInWithOAuth({
+      provider: 'google',
+      // Land on root — ProtectedRoute decides where they actually go
+      // (new -> onboarding, onboarded -> paywall or dashboard).
+      options: { redirectTo: `${window.location.origin}/` },
+    })
 
   const signOut = () => supabase.auth.signOut()
 
