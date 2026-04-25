@@ -1,12 +1,13 @@
 import { useState } from 'react'
-import { Hammer, CheckCircle2, Loader2 } from 'lucide-react'
+import { CheckCircle2, Loader2, ArrowRight, ShieldCheck } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { redirectToCheckout } from '../lib/stripe'
+import AuthLayout from '../components/AuthLayout'
 
 const FEATURES = [
   'AI-powered estimates in seconds',
   'Lead & follow-up tracker',
-  'Professional invoicing',
+  'Professional invoicing + PDFs',
   'Project notes & change orders',
   'Marketing copy generator',
   'Shareable client links',
@@ -19,8 +20,7 @@ export default function Paywall() {
   const [error, setError]     = useState('')
 
   const handleSubscribe = async () => {
-    setLoading(true)
-    setError('')
+    setLoading(true); setError('')
     try {
       await redirectToCheckout(user.id, profile?.email || user.email)
     } catch (e) {
@@ -30,48 +30,58 @@ export default function Paywall() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-md space-y-6">
-        <div className="text-center">
-          <div className="w-12 h-12 bg-brand-500 rounded-xl flex items-center justify-center mx-auto mb-3">
-            <Hammer size={24} className="text-white" />
-          </div>
-          <h1 className="text-2xl font-bold">Start your free trial</h1>
-          <p className="text-gray-500 text-sm mt-1">7 days free · then $29/month · cancel anytime</p>
-        </div>
-
-        <div className="card p-6 space-y-5">
-          <div className="text-center py-2">
-            <span className="text-5xl font-bold">$29</span>
-            <span className="text-gray-500 text-lg">/mo</span>
-            <p className="text-sm text-gray-400 mt-1">Everything included. No hidden fees.</p>
-          </div>
-
-          <ul className="space-y-2.5">
-            {FEATURES.map(f => (
-              <li key={f} className="flex items-center gap-2.5 text-sm text-gray-700">
-                <CheckCircle2 size={16} className="text-green-500 shrink-0" />
-                {f}
-              </li>
-            ))}
-          </ul>
-
-          {error && <p className="text-sm text-red-600">{error}</p>}
-
-          <button onClick={handleSubscribe} disabled={loading} className="btn-primary w-full justify-center py-3 text-base">
-            {loading ? <Loader2 size={18} className="animate-spin" /> : 'Start Free Trial →'}
+    <AuthLayout
+      eyebrow="// Setup · Step 2 of 2"
+      title="Start your free trial"
+      subtitle="7 days free · then $29/month · cancel anytime."
+      footer={
+        <>Wrong account?{' '}
+          <button onClick={signOut} className="text-brand-600 dark:text-brand-400 font-semibold hover:underline">
+            Sign out
           </button>
-
-          <p className="text-xs text-center text-gray-400">
-            Secure payment via Stripe. Cancel anytime from your account settings.
-          </p>
+        </>
+      }
+    >
+      <div className="space-y-5">
+        {/* Price plate */}
+        <div className="relative card p-5 text-center overflow-hidden">
+          <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-brand-500 via-brand-400 to-brand-600" />
+          <p className="stamp-label text-brand-600 dark:text-brand-400">// All-Inclusive</p>
+          <div className="mt-2 flex items-baseline justify-center gap-1">
+            <span className="font-display font-bold text-5xl tracking-tightest text-foreground">$29</span>
+            <span className="text-muted-foreground text-lg font-display">/mo</span>
+          </div>
+          <p className="text-xs text-muted-foreground mt-1">No hidden fees · No tier upsells</p>
         </div>
 
-        <p className="text-center text-sm text-gray-500">
-          Wrong account?{' '}
-          <button onClick={signOut} className="text-brand-600 font-medium hover:underline">Sign out</button>
+        {/* Features list */}
+        <ul className="space-y-2.5">
+          {FEATURES.map(f => (
+            <li key={f} className="flex items-center gap-2.5 text-sm text-foreground">
+              <CheckCircle2 size={16} className="text-green-500 dark:text-green-400 shrink-0" />
+              {f}
+            </li>
+          ))}
+        </ul>
+
+        {error && (
+          <p className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-md px-3 py-2">
+            {error}
+          </p>
+        )}
+
+        <button
+          onClick={handleSubscribe}
+          disabled={loading}
+          className="btn-primary w-full justify-center py-3 text-base"
+        >
+          {loading ? <Loader2 size={18} className="animate-spin" /> : <>Start Free Trial <ArrowRight size={16} /></>}
+        </button>
+
+        <p className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
+          <ShieldCheck size={12} /> Secure payment via Stripe. Cancel anytime.
         </p>
       </div>
-    </div>
+    </AuthLayout>
   )
 }

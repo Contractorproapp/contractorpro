@@ -1,10 +1,31 @@
 import { useState, useEffect } from 'react'
-import { Save, Upload, Eye, EyeOff, CheckCircle2, Loader2, ExternalLink, CreditCard, Lock } from 'lucide-react'
+import {
+  Save, Upload, Eye, EyeOff, CheckCircle2, Loader2, ExternalLink,
+  CreditCard, Lock, Building2, Sparkles,
+} from 'lucide-react'
+import { motion } from 'framer-motion'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { useToast } from '../components/Toast'
+import PageHeader from '../components/PageHeader'
+import { cn } from '../lib/utils'
 
 const DAILY_LIMIT = 350
+
+function SectionCard({ icon: Icon, title, children, accent = false }) {
+  return (
+    <div className="card p-5 sm:p-6 space-y-5 relative overflow-hidden">
+      {accent && (
+        <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-brand-500 via-brand-400 to-brand-600" />
+      )}
+      <div className="flex items-center gap-2">
+        {Icon && <Icon size={16} className="text-brand-500" />}
+        <h2 className="font-display font-semibold text-base text-foreground">{title}</h2>
+      </div>
+      {children}
+    </div>
+  )
+}
 
 function AiUsageCard() {
   const { user } = useAuth()
@@ -16,21 +37,28 @@ function AiUsageCard() {
   }, [user])
 
   const pct = used == null ? 0 : Math.min(100, (used / DAILY_LIMIT) * 100)
-  const color = pct >= 100 ? 'bg-red-500' : pct >= 80 ? 'bg-yellow-500' : 'bg-brand-500'
+  const tone = pct >= 100 ? 'bg-red-500' : pct >= 80 ? 'bg-yellow-500' : 'bg-brand-500'
 
   return (
-    <div className="card p-5 space-y-3">
+    <SectionCard icon={Sparkles} title="AI Usage Today">
       <div className="flex items-center justify-between">
-        <h2 className="font-semibold">AI Usage Today</h2>
-        <span className="text-sm text-gray-500">{used ?? '—'} / {DAILY_LIMIT}</span>
+        <span className="stamp-label text-muted-foreground">Calls today</span>
+        <span className="font-display font-bold text-base tabular-nums text-foreground">
+          {used ?? '—'} <span className="text-muted-foreground font-medium text-sm">/ {DAILY_LIMIT}</span>
+        </span>
       </div>
-      <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-        <div className={`h-full ${color} transition-all`} style={{ width: `${pct}%` }} />
+      <div className="h-2 bg-muted rounded-full overflow-hidden">
+        <motion.div
+          initial={{ width: 0 }}
+          animate={{ width: `${pct}%` }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          className={cn('h-full transition-colors', tone)}
+        />
       </div>
-      <p className="text-xs text-gray-400">
+      <p className="text-xs text-muted-foreground leading-relaxed">
         Daily cap on Claude API calls (estimates, follow-ups, marketing). Resets every 24h. Protects you from runaway costs if your key leaks.
       </p>
-    </div>
+    </SectionCard>
   )
 }
 
@@ -45,8 +73,8 @@ function ChangePasswordCard() {
 
   const submit = async () => {
     setErr('')
-    if (pw.length < 8) return setErr('Password must be at least 8 characters.')
-    if (pw !== confirm) return setErr('Passwords do not match.')
+    if (pw.length < 8)        return setErr('Password must be at least 8 characters.')
+    if (pw !== confirm)       return setErr('Passwords do not match.')
     setBusy(true)
     const { error } = await updatePassword(pw)
     setBusy(false)
@@ -56,11 +84,7 @@ function ChangePasswordCard() {
   }
 
   return (
-    <div className="card p-5 space-y-4">
-      <div className="flex items-center gap-2">
-        <Lock size={16} className="text-gray-500" />
-        <h2 className="font-semibold">Change Password</h2>
-      </div>
+    <SectionCard icon={Lock} title="Change Password">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="label">New Password</label>
@@ -72,7 +96,11 @@ function ChangePasswordCard() {
               value={pw}
               onChange={e => setPw(e.target.value)}
             />
-            <button onClick={() => setShow(s => !s)} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400">
+            <button
+              onClick={() => setShow(s => !s)}
+              aria-label={show ? 'Hide' : 'Show'}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
+            >
               {show ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
           </div>
@@ -88,13 +116,17 @@ function ChangePasswordCard() {
           />
         </div>
       </div>
-      {err && <p className="text-sm text-red-600">{err}</p>}
+      {err && (
+        <p className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-md px-3 py-2">
+          {err}
+        </p>
+      )}
       <div className="flex justify-end">
         <button onClick={submit} disabled={busy || !pw || !confirm} className="btn-primary">
           {busy ? <Loader2 size={15} className="animate-spin" /> : <><Lock size={15} /> Update Password</>}
         </button>
       </div>
-    </div>
+    </SectionCard>
   )
 }
 
@@ -130,8 +162,7 @@ export default function Profile() {
   }
 
   const handleSave = async () => {
-    setSaving(true)
-    setError('')
+    setSaving(true); setError('')
 
     let logoUrl = profile?.logo_url || null
     if (logoFile) {
@@ -161,32 +192,32 @@ export default function Profile() {
   }
 
   const manageSubscription = async () => {
-    // Redirect to Stripe Customer Portal
     const { data, error } = await supabase.functions.invoke('customer-portal', { body: { user_id: user.id } })
     if (data?.url) window.open(data.url, '_blank')
     else toast.error(error?.message || 'Could not open billing portal')
   }
 
+  const isActive = profile?.subscription_status === 'active'
+
   return (
     <div className="max-w-2xl mx-auto space-y-6">
-      <div>
-        <h1 className="page-title">Profile & Settings</h1>
-        <p className="text-gray-500 text-sm mt-0.5">Your business info, API key, and billing</p>
-      </div>
+      <PageHeader
+        eyebrow="// Settings"
+        title="Profile & Settings"
+        subtitle="Your business info, API key, and billing."
+      />
 
       {/* Business Info */}
-      <div className="card p-5 space-y-5">
-        <h2 className="font-semibold">Business Info</h2>
-
+      <SectionCard icon={Building2} title="Business Info" accent>
         <div className="flex items-center gap-4">
-          <div className="w-20 h-20 rounded-xl border-2 border-dashed border-gray-300 flex items-center justify-center bg-gray-50 overflow-hidden shrink-0">
+          <div className="w-20 h-20 rounded-xl border-2 border-dashed border-border flex items-center justify-center bg-muted overflow-hidden shrink-0">
             {logoPreview
               ? <img src={logoPreview} alt="Logo" className="w-full h-full object-cover" />
-              : <Upload size={22} className="text-gray-400" />}
+              : <Upload size={22} className="text-muted-foreground" />}
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-700 mb-1">Business Logo</p>
-            <p className="text-xs text-gray-400 mb-2">Shows on estimates, invoices & public links</p>
+            <p className="text-sm font-display font-semibold text-foreground mb-1">Business Logo</p>
+            <p className="text-xs text-muted-foreground mb-2">Shows on estimates, invoices & public links</p>
             <label className="btn-secondary text-xs py-1.5 px-3 cursor-pointer">
               {logoPreview ? 'Change Logo' : 'Upload Logo'}
               <input type="file" accept="image/*" onChange={handleLogo} className="hidden" />
@@ -194,7 +225,7 @@ export default function Profile() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="label">Business Name</label>
             <input className="input" placeholder="Smith Roofing & Construction" value={businessName} onChange={e => setBusinessName(e.target.value)} />
@@ -206,57 +237,77 @@ export default function Profile() {
         </div>
 
         <div>
-          <label className="label">Google Review Link (optional)</label>
+          <label className="label">Google Review Link <span className="text-muted-foreground text-xs font-normal">(optional)</span></label>
           <input className="input" placeholder="https://g.page/r/..." value={reviewUrl} onChange={e => setReviewUrl(e.target.value)} />
-          <p className="text-xs text-gray-400 mt-1">Used for the "Request Review" button on paid invoices. Get yours from your Google Business profile.</p>
+          <p className="text-xs text-muted-foreground mt-1.5">
+            Used for the "Request Review" button on paid invoices. Get yours from your Google Business profile.
+          </p>
         </div>
 
         <div>
           <label className="label">Claude API Key</label>
-          <p className="text-xs text-gray-400 mb-1.5">
+          <p className="text-xs text-muted-foreground mb-2">
             Powers all AI features. Get yours at{' '}
-            <a href="https://console.anthropic.com" target="_blank" rel="noreferrer" className="text-brand-600 underline inline-flex items-center gap-0.5">
+            <a href="https://console.anthropic.com" target="_blank" rel="noreferrer" className="text-brand-600 dark:text-brand-400 font-semibold underline inline-flex items-center gap-0.5">
               console.anthropic.com <ExternalLink size={10} />
             </a>
           </p>
           <div className="relative">
             <input
-              className="input pr-10"
+              className="input pr-10 font-mono"
               type={showKey ? 'text' : 'password'}
               placeholder="sk-ant-api03-…"
               value={apiKey}
               onChange={e => setApiKey(e.target.value)}
             />
-            <button onClick={() => setShowKey(s => !s)} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400">
+            <button
+              onClick={() => setShowKey(s => !s)}
+              aria-label={showKey ? 'Hide key' : 'Show key'}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
+            >
               {showKey ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
           </div>
         </div>
 
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        {error && (
+          <p className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-md px-3 py-2">
+            {error}
+          </p>
+        )}
 
         <div className="flex justify-end">
           <button onClick={handleSave} disabled={saving} className="btn-primary">
-            {saving ? <Loader2 size={15} className="animate-spin" /> : saved ? <><CheckCircle2 size={15} /> Saved!</> : <><Save size={15} /> Save Changes</>}
+            {saving
+              ? <Loader2 size={15} className="animate-spin" />
+              : saved
+                ? <><CheckCircle2 size={15} /> Saved!</>
+                : <><Save size={15} /> Save Changes</>}
           </button>
         </div>
-      </div>
+      </SectionCard>
 
       <ChangePasswordCard />
-
       <AiUsageCard />
 
       {/* Billing */}
-      <div className="card p-5 space-y-3">
-        <h2 className="font-semibold">Billing</h2>
-        <div className="flex items-center justify-between">
+      <SectionCard icon={CreditCard} title="Billing">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <p className="text-sm text-gray-700">
-              Plan: <span className="font-medium">ContractorPro — $29/month</span>
+            <p className="text-sm text-foreground">
+              <span className="text-muted-foreground">Plan:</span>{' '}
+              <span className="font-display font-semibold">ContractorPro — $29/mo</span>
             </p>
-            <p className="text-xs text-gray-400 mt-0.5">
-              Status: <span className={`font-medium ${profile?.subscription_status === 'active' ? 'text-green-600' : 'text-red-500'}`}>
-                {profile?.subscription_status === 'active' ? 'Active' : 'Inactive'}
+            <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1.5">
+              Status:
+              <span className={cn(
+                'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold tracking-tight',
+                isActive
+                  ? 'bg-green-100 text-green-700 dark:bg-green-500/15 dark:text-green-400'
+                  : 'bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-400'
+              )}>
+                <span className={cn('w-1.5 h-1.5 rounded-full', isActive ? 'bg-green-500' : 'bg-red-500')} />
+                {isActive ? 'Active' : 'Inactive'}
               </span>
             </p>
           </div>
@@ -264,13 +315,15 @@ export default function Profile() {
             <CreditCard size={15} /> Manage Billing
           </button>
         </div>
-      </div>
+      </SectionCard>
 
       {/* Account */}
-      <div className="card p-5 space-y-2">
-        <h2 className="font-semibold">Account</h2>
-        <p className="text-sm text-gray-500">Signed in as <strong>{user?.email}</strong></p>
-      </div>
+      <SectionCard title="Account">
+        <p className="text-sm text-muted-foreground">
+          Signed in as{' '}
+          <strong className="font-display font-semibold text-foreground">{user?.email}</strong>
+        </p>
+      </SectionCard>
     </div>
   )
 }

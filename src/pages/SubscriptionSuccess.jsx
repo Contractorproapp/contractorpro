@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { CheckCircle2, Loader2 } from 'lucide-react'
+import { CheckCircle2, Loader2, AlertTriangle } from 'lucide-react'
+import { motion } from 'framer-motion'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 
@@ -33,29 +34,58 @@ export default function SubscriptionSuccess() {
   }, [user])
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="card p-10 max-w-sm w-full text-center space-y-4">
+    <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Subtle blueprint background */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-[0.04] dark:opacity-[0.08]"
+        style={{
+          backgroundImage:
+            'linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)',
+          backgroundSize: '32px 32px',
+        }}
+      />
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+        className="card p-10 max-w-sm w-full text-center space-y-4 relative overflow-hidden"
+      >
+        <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-brand-500 via-brand-400 to-brand-600" />
+
         {status === 'verifying' && (
           <>
             <Loader2 size={40} className="animate-spin text-brand-500 mx-auto" />
-            <p className="font-semibold">Activating your account…</p>
+            <p className="font-display font-semibold text-foreground">Activating your account…</p>
+            <p className="stamp-label text-muted-foreground">Hold tight</p>
           </>
         )}
+
         {status === 'success' && (
           <>
-            <CheckCircle2 size={48} className="text-green-500 mx-auto" />
-            <h2 className="text-xl font-bold">You're all set!</h2>
-            <p className="text-gray-500 text-sm">Welcome to ContractorPro. Taking you to the dashboard…</p>
+            <div className="w-16 h-16 mx-auto rounded-full bg-green-100 dark:bg-green-500/15 flex items-center justify-center ring-4 ring-green-50 dark:ring-green-500/5">
+              <CheckCircle2 size={28} className="text-green-600 dark:text-green-400" />
+            </div>
+            <h2 className="font-display font-bold text-2xl text-foreground">You're all set!</h2>
+            <p className="text-sm text-muted-foreground">
+              Welcome to ContractorPro. Taking you to the dashboard…
+            </p>
           </>
         )}
+
         {status === 'error' && (
           <>
-            <p className="text-red-600 font-semibold">Something went wrong</p>
-            <p className="text-sm text-gray-500">{error}</p>
-            <button onClick={() => navigate('/subscribe')} className="btn-primary">Try Again</button>
+            <div className="w-16 h-16 mx-auto rounded-full bg-red-100 dark:bg-red-500/15 flex items-center justify-center ring-4 ring-red-50 dark:ring-red-500/5">
+              <AlertTriangle size={28} className="text-red-600 dark:text-red-400" />
+            </div>
+            <p className="font-display font-bold text-foreground">Something went wrong</p>
+            <p className="text-sm text-muted-foreground">{error}</p>
+            <button onClick={() => navigate('/subscribe')} className="btn-primary w-full justify-center">
+              Try Again
+            </button>
           </>
         )}
-      </div>
+      </motion.div>
     </div>
   )
 }
