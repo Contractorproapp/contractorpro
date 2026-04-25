@@ -1,55 +1,163 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ----------------------------------------------------------
+   Design Tokens — Light + Dark
+   Industrial / contractor palette: warm off-white + steel + safety orange.
+   ---------------------------------------------------------- */
 @layer base {
+  :root {
+    /* Surfaces */
+    --background:           60 14% 98%;   /* #FAFAF7 warm off-white */
+    --foreground:           222 47% 11%;  /* slate-900 */
+    --card:                 0 0% 100%;
+    --card-foreground:      222 47% 11%;
+    --popover:              0 0% 100%;
+    --popover-foreground:   222 47% 11%;
+
+    /* Brand / actions */
+    --primary:              22 92% 52%;   /* #F97316 safety orange */
+    --primary-foreground:   0 0% 100%;
+    --secondary:            215 25% 27%;  /* slate-700 industrial */
+    --secondary-foreground: 0 0% 100%;
+    --accent:               210 40% 96%;  /* slate-100 */
+    --accent-foreground:    222 47% 11%;
+    --destructive:          0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Neutrals */
+    --muted:                210 40% 96%;
+    --muted-foreground:     215 16% 47%;
+    --border:               214 32% 91%;
+    --input:                214 32% 91%;
+    --ring:                 22 92% 52%;
+
+    --radius: 0.625rem;
+  }
+
+  .dark {
+    /* Surfaces — true industrial dark, slight warm tint to avoid clinical blue */
+    --background:           222 47% 7%;   /* near-black slate */
+    --foreground:           210 40% 96%;
+    --card:                 222 40% 11%;
+    --card-foreground:      210 40% 96%;
+    --popover:              222 40% 11%;
+    --popover-foreground:   210 40% 96%;
+
+    /* Brand stays orange — pop against dark steel */
+    --primary:              22 92% 56%;
+    --primary-foreground:   222 47% 7%;
+    --secondary:            215 28% 20%;
+    --secondary-foreground: 210 40% 96%;
+    --accent:               217 33% 18%;
+    --accent-foreground:    210 40% 96%;
+    --destructive:          0 70% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --muted:                217 33% 18%;
+    --muted-foreground:     215 20% 65%;
+    --border:               217 33% 20%;
+    --input:                217 33% 20%;
+    --ring:                 22 92% 56%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
   html {
-    font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-    font-feature-settings: 'cv11', 'ss01';
+    font-family: 'DM Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    font-feature-settings: 'ss01', 'cv11';
+    color-scheme: light dark;
   }
+
   body {
-    @apply text-gray-900 antialiased;
-    background-color: #FAFAF7;
+    @apply bg-background text-foreground antialiased;
+    /* Keep transitions short so theme flip feels snappy, not laggy. */
+    transition: background-color 150ms ease, color 150ms ease;
   }
+
+  /* Industrial display type — Space Grotesk, tight tracking, heavy weights. */
   h1, h2, h3, h4 {
-    letter-spacing: -0.015em;
+    font-family: 'Space Grotesk', 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+    letter-spacing: -0.02em;
+  }
+  h1 { font-weight: 700; }
+  h2 { font-weight: 700; }
+  h3 { font-weight: 600; }
+
+  /* Respect reduced motion globally. */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }
 
+/* ----------------------------------------------------------
+   Legacy component classes — kept for compatibility while we
+   roll out shadcn/ui page by page. Now dark-mode aware.
+   ---------------------------------------------------------- */
 @layer components {
   /* ---- Buttons ---- */
   .btn-primary {
-    @apply inline-flex items-center gap-2 px-4 py-2 bg-brand-600 text-white rounded-lg font-medium hover:bg-brand-700 active:bg-brand-800 shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none;
+    @apply inline-flex items-center gap-2 px-4 py-2 bg-brand-600 text-white rounded-lg font-semibold tracking-tight
+           hover:bg-brand-700 active:bg-brand-800 shadow-sm transition-all
+           disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none
+           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background
+           cursor-pointer;
   }
   .btn-primary:hover:not(:disabled) {
-    box-shadow: 0 6px 20px -4px rgba(234, 88, 12, 0.35);
+    box-shadow: 0 6px 20px -4px rgba(234, 88, 12, 0.4);
   }
   .btn-secondary {
-    @apply inline-flex items-center gap-2 px-4 py-2 bg-white text-gray-700 border border-gray-200 rounded-lg font-medium hover:bg-gray-50 hover:border-gray-300 active:bg-gray-100 shadow-sm transition-all disabled:opacity-50;
+    @apply inline-flex items-center gap-2 px-4 py-2 bg-card text-foreground border border-border rounded-lg font-medium
+           hover:bg-accent hover:border-steel-300 dark:hover:border-steel-600
+           active:bg-accent shadow-sm transition-all disabled:opacity-50
+           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background
+           cursor-pointer;
   }
   .btn-danger {
-    @apply inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 active:bg-red-800 shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg font-medium
+           hover:bg-red-700 active:bg-red-800 shadow-sm transition-all
+           disabled:opacity-50 disabled:cursor-not-allowed
+           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 focus-visible:ring-offset-background
+           cursor-pointer;
   }
   .btn-ghost {
-    @apply inline-flex items-center gap-2 px-3 py-2 text-gray-600 rounded-lg font-medium hover:bg-gray-100 transition-colors;
+    @apply inline-flex items-center gap-2 px-3 py-2 text-muted-foreground rounded-lg font-medium
+           hover:bg-accent hover:text-foreground transition-colors cursor-pointer;
   }
 
   /* ---- Cards / inputs ---- */
   .card {
-    @apply bg-white rounded-2xl border border-gray-100 transition-shadow;
+    @apply bg-card text-card-foreground rounded-2xl border border-border transition-shadow;
     box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.06);
   }
+  .dark .card {
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.3);
+  }
   .card-hover {
-    @apply card hover:border-gray-200;
+    @apply card hover:border-steel-300 dark:hover:border-steel-600;
   }
   .card-hover:hover {
     box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08), 0 2px 4px rgba(15, 23, 42, 0.06);
   }
+  .dark .card-hover:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.4);
+  }
   .input {
-    @apply w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/40 focus:border-brand-500 placeholder-gray-400 transition-colors;
+    @apply w-full px-3 py-2 bg-card text-foreground border border-border rounded-lg text-sm
+           focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring
+           placeholder:text-muted-foreground transition-colors;
   }
   .label {
-    @apply block text-sm font-medium text-gray-700 mb-1.5;
+    @apply block text-sm font-medium text-foreground mb-1.5;
   }
 
   /* ---- Page header ---- */
@@ -57,10 +165,10 @@
     @apply flex flex-wrap items-start justify-between gap-3 mb-6;
   }
   .page-title {
-    @apply text-2xl lg:text-3xl font-bold tracking-tight text-gray-900;
+    @apply text-2xl lg:text-3xl font-bold tracking-tight text-foreground font-display;
   }
   .page-subtitle {
-    @apply text-sm text-gray-500 mt-1;
+    @apply text-sm text-muted-foreground mt-1;
   }
 
   /* ---- Stat tile ---- */
@@ -68,21 +176,27 @@
     @apply card p-5;
   }
   .stat-label {
-    @apply text-xs uppercase tracking-wide text-gray-500 font-medium;
+    @apply text-xs uppercase tracking-stamp text-muted-foreground font-semibold;
   }
   .stat-value {
-    @apply text-3xl font-bold text-gray-900 tabular-nums mt-1;
+    @apply text-3xl font-bold text-foreground tabular-nums mt-1 font-display;
   }
 
-  /* ---- Semantic badges ----
-     Meanings: success = paid/done/active · warning = pending/attention ·
-     danger = overdue/error · info = draft/neutral · accent = featured */
+  /* ---- Semantic badges ---- */
   .badge {
-    @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium;
+    @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold tracking-tight;
   }
-  .badge-success { @apply badge bg-green-100 text-green-700; }
-  .badge-warning { @apply badge bg-yellow-100 text-yellow-700; }
-  .badge-danger  { @apply badge bg-red-100 text-red-700; }
-  .badge-info    { @apply badge bg-gray-100 text-gray-600; }
-  .badge-accent  { @apply badge bg-brand-100 text-brand-700; }
+  .badge-success { @apply badge bg-green-100 text-green-700 dark:bg-green-500/15 dark:text-green-400; }
+  .badge-warning { @apply badge bg-yellow-100 text-yellow-700 dark:bg-yellow-500/15 dark:text-yellow-400; }
+  .badge-danger  { @apply badge bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-400; }
+  .badge-info    { @apply badge bg-muted text-muted-foreground; }
+  .badge-accent  { @apply badge bg-brand-100 text-brand-700 dark:bg-brand-500/15 dark:text-brand-400; }
+
+  /* ---- Industrial accents ---- */
+  .stamp-label {
+    @apply uppercase font-semibold tracking-stamp text-xs text-muted-foreground;
+  }
+  .blueprint-bg {
+    @apply bg-blueprint-grid bg-blueprint-grid;
+  }
 }

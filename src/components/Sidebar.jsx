@@ -6,6 +6,7 @@ import {
   Contact, Calendar as CalendarIcon, Wallet,
 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
+import ThemeToggle from './ThemeToggle'
 
 const NAV = [
   { to: '/',           icon: LayoutDashboard, label: 'Dashboard' },
@@ -102,8 +103,9 @@ export default function Sidebar() {
           <LogOut size={18} />
           Sign Out
         </button>
-        <div className="px-3 pt-2">
+        <div className="px-3 pt-2 flex items-center justify-between gap-2">
           <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+          <ThemeToggle className="bg-gray-800 border-gray-700 text-gray-200 hover:bg-gray-700" />
         </div>
       </div>
     </div>
@@ -120,9 +122,12 @@ export default function Sidebar() {
           }
           <span className="font-bold text-sm">{profile?.business_name || 'ContractorPro'}</span>
         </div>
-        <button onClick={() => setMobileOpen(true)} className="text-gray-300 hover:text-white">
-          <Menu size={22} />
-        </button>
+        <div className="flex items-center gap-2">
+          <ThemeToggle className="bg-gray-800 border-gray-700 text-gray-200 hover:bg-gray-700" />
+          <button onClick={() => setMobileOpen(true)} className="text-gray-300 hover:text-white p-2 -mr-2">
+            <Menu size={22} />
+          </button>
+        </div>
       </div>
 
       {/* Mobile drawer overlay */}
