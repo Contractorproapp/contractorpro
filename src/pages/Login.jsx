@@ -3,10 +3,9 @@ import { Link, useNavigate } from 'react-router-dom'
 import { Loader2, Mail, Lock } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import AuthLayout from '../components/AuthLayout'
-import GoogleButton from '../components/GoogleButton'
 
 export default function Login() {
-  const { signIn, signInWithGoogle } = useAuth()
+  const { signIn } = useAuth()
   const navigate = useNavigate()
   const [email, setEmail]       = useState('')
   const [password, setPassword] = useState('')
@@ -25,12 +24,6 @@ export default function Login() {
     else navigate('/')
   }
 
-  const handleGoogle = async () => {
-    setError('')
-    const { error } = await signInWithGoogle()
-    if (error) setError(error.message)
-  }
-
   return (
     <AuthLayout
       eyebrow="// Sign In"
@@ -45,14 +38,6 @@ export default function Login() {
       }
     >
       <div className="space-y-4">
-        <GoogleButton onClick={handleGoogle} />
-
-        <div className="flex items-center gap-3">
-          <div className="flex-1 h-px bg-border" />
-          <span className="stamp-label text-muted-foreground">Or with email</span>
-          <div className="flex-1 h-px bg-border" />
-        </div>
-
         <form onSubmit={handleSubmit} className="space-y-3">
           <div>
             <label className="label">Email</label>
