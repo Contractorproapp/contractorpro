@@ -19,7 +19,10 @@ export default function Login() {
     setLoading(true)
     const { error } = await signIn(email, password)
     if (error) { setError(error.message); setLoading(false) }
-    else navigate('/onboarding')
+    // Send to root — ProtectedRoute will route based on actual state:
+    // no onboarding → /onboarding, onboarded but unsubscribed → /subscribe,
+    // fully set up → Dashboard. Avoids forcing returning users to redo onboarding.
+    else navigate('/')
   }
 
   const handleGoogle = async () => {

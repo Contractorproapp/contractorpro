@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { Upload, Loader2, Eye, EyeOff, ExternalLink, ArrowRight } from 'lucide-react'
 import { supabase } from '../lib/supabase'
@@ -6,8 +6,16 @@ import { useAuth } from '../contexts/AuthContext'
 import AuthLayout from '../components/AuthLayout'
 
 export default function Onboarding() {
-  const { user, refreshProfile } = useAuth()
+  const { user, profile, refreshProfile, onboardingComplete, isSubscribed } = useAuth()
   const navigate = useNavigate()
+
+  // Skip if already onboarded — send to dashboard or paywall as appropriate.
+  useEffect(() => {
+    if (!profile) return
+    if (onboardingComplete) {
+      navigate(isSubscribed ? '/' : '/subscribe', { replace: true })
+    }
+  }, [profile, onboardingComplete, isSubscribed, navigate])
   const [businessName, setBusinessName] = useState('')
   const [phone, setPhone]               = useState('')
   const [apiKey, setApiKey]             = useState('')

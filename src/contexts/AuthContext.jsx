@@ -53,7 +53,11 @@ export function AuthProvider({ children }) {
 
   const refreshProfile = () => user && fetchProfile(user.id)
 
-  const isSubscribed = profile?.subscription_status === 'active'
+  // Treat any active-billing state as subscribed. Stripe trials have status
+  // `trialing`, paid subs are `active`. Both should grant app access.
+  const isSubscribed =
+    profile?.subscription_status === 'active' ||
+    profile?.subscription_status === 'trialing'
   const onboardingComplete = profile?.onboarding_complete === true
 
   return (
