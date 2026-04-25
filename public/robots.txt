@@ -1,0 +1,28 @@
+User-agent: *
+Allow: /
+
+# Block app surfaces and signed-in routes — no value to search engines and
+# they could leak private content from indexed share links.
+Disallow: /login
+Disallow: /signup
+Disallow: /forgot-password
+Disallow: /reset-password
+Disallow: /onboarding
+Disallow: /subscribe
+Disallow: /dashboard
+Disallow: /estimates
+Disallow: /invoices
+Disallow: /leads
+Disallow: /clients
+Disallow: /projects
+Disallow: /calendar
+Disallow: /expenses
+Disallow: /marketing
+Disallow: /profile
+
+# Public share links are tokenized but not meant to be indexed.
+Disallow: /invoice/
+Disallow: /estimate/
+Disallow: /project/
+
+Sitemap: https://contractorpro-azure.vercel.app/sitemap.xml
