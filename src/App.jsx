@@ -10,6 +10,7 @@ import CommandPalette from './components/CommandPalette'
 import QuickAdd from './components/QuickAdd'
 import MobileTabs from './components/MobileTabs'
 import TopSearch from './components/TopSearch'
+import PageTransition from './components/PageTransition'
 
 import Login               from './pages/Login'
 import Signup              from './pages/Signup'
@@ -46,10 +47,21 @@ function Root() {
 
 function AppShell({ children }) {
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen bg-background text-foreground">
       <Sidebar />
-      <main className="flex-1 p-4 lg:p-8 pb-20 lg:pb-8 lg:pt-20 overflow-y-auto">
-        {children}
+      <main className="relative flex-1 overflow-y-auto pt-14 lg:pt-0">
+        {/* Subtle blueprint-grid accent — top-right, low opacity, behind content */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-blueprint-grid bg-blueprint-grid opacity-[0.35] dark:opacity-[0.15]"
+          style={{
+            maskImage: 'linear-gradient(to bottom, black 0%, transparent 100%)',
+            WebkitMaskImage: 'linear-gradient(to bottom, black 0%, transparent 100%)',
+          }}
+        />
+        <div className="relative p-4 lg:p-8 pb-24 lg:pb-8">
+          <PageTransition>{children}</PageTransition>
+        </div>
       </main>
       <MobileTabs onMore={() => window.dispatchEvent(new CustomEvent('open-mobile-drawer'))} />
     </div>
