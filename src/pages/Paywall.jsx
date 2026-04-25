@@ -19,6 +19,11 @@ export default function Paywall() {
   const [loading, setLoading] = useState(false)
   const [error, setError]     = useState('')
 
+  // Returning customers (already have a Stripe customer record) don't get a
+  // second free trial — they go straight to paid. Drives both UI copy and
+  // the server-side trial logic in create-checkout-session.
+  const isReturning = !!profile?.stripe_customer_id
+
   const handleSubscribe = async () => {
     setLoading(true); setError('')
     try {
@@ -31,9 +36,13 @@ export default function Paywall() {
 
   return (
     <AuthLayout
-      eyebrow="// Setup · Step 2 of 2"
-      title="Start your free trial"
-      subtitle="7 days free · then $29/month · cancel anytime."
+      eyebrow={isReturning ? '// Resubscribe' : '// Setup · Step 2 of 2'}
+      title={isReturning ? 'Welcome back' : 'Start your free trial'}
+      subtitle={
+        isReturning
+          ? '$29/month · cancel anytime.'
+          : '7 days free · then $29/month · cancel anytime.'
+      }
       footer={
         <>Wrong account?{' '}
           <button onClick={signOut} className="text-brand-600 dark:text-brand-400 font-semibold hover:underline">
@@ -51,7 +60,9 @@ export default function Paywall() {
             <span className="font-display font-bold text-5xl tracking-tightest text-foreground">$29</span>
             <span className="text-muted-foreground text-lg font-display">/mo</span>
           </div>
-          <p className="text-xs text-muted-foreground mt-1">No hidden fees · No tier upsells</p>
+          <p className="text-xs text-muted-foreground mt-1">
+            {isReturning ? 'Billed today, then monthly' : 'No hidden fees · No tier upsells'}
+          </p>
         </div>
 
         {/* Features list */}
@@ -75,7 +86,11 @@ export default function Paywall() {
           disabled={loading}
           className="btn-primary w-full justify-center py-3 text-base"
         >
-          {loading ? <Loader2 size={18} className="animate-spin" /> : <>Start Free Trial <ArrowRight size={16} /></>}
+          {loading
+            ? <Loader2 size={18} className="animate-spin" />
+            : isReturning
+              ? <>Subscribe — $29/mo <ArrowRight size={16} /></>
+              : <>Start Free Trial <ArrowRight size={16} /></>}
         </button>
 
         <p className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
