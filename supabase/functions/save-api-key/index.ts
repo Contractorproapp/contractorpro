@@ -3,11 +3,39 @@
 // The plaintext key never persists anywhere — not in DB, not in logs.
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
-import { encryptSecret } from '../_shared/crypto.ts'
 
 const SUPABASE_URL          = Deno.env.get('SUPABASE_URL')!
 const SUPABASE_SERVICE_ROLE = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 const APP_URL               = Deno.env.get('APP_URL') ?? '*'
+const ENCRYPTION_KEY_B64    = Deno.env.get('ENCRYPTION_KEY') ?? ''
+
+// ─── Inline AES-GCM-256 helpers (mirror of _shared/crypto.ts) ───
+// Inlined so the function deploys cleanly via the Dashboard editor,
+// which can't resolve cross-file imports.
+let cachedKey: CryptoKey | null = null
+async function getCryptoKey(): Promise<CryptoKey> {
+  if (cachedKey) return cachedKey
+  if (!ENCRYPTION_KEY_B64) throw new Error('ENCRYPTION_KEY env var not set')
+  const bin = atob(ENCRYPTION_KEY_B64)
+  const raw = new Uint8Array(bin.length)
+  for (let i = 0; i < bin.length; i++) raw[i] = bin.charCodeAt(i)
+  if (raw.byteLength !== 32) throw new Error('ENCRYPTION_KEY must decode to 32 bytes')
+  cachedKey = await crypto.subtle.importKey('raw', raw, { name: 'AES-GCM' }, false, ['encrypt', 'decrypt'])
+  return cachedKey
+}
+async function encryptSecret(plaintext: string): Promise<string> {
+  if (!plaintext) return ''
+  const key = await getCryptoKey()
+  const iv  = crypto.getRandomValues(new Uint8Array(12))
+  const enc = new TextEncoder().encode(plaintext)
+  const ct  = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, enc))
+  const combined = new Uint8Array(iv.byteLength + ct.byteLength)
+  combined.set(iv, 0)
+  combined.set(ct, iv.byteLength)
+  let bin = ''
+  for (let i = 0; i < combined.byteLength; i++) bin += String.fromCharCode(combined[i])
+  return btoa(bin)
+}
 
 const admin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE)
 
