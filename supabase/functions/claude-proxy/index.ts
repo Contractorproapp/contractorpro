@@ -1,4 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
+import { decryptSecret } from '../_shared/crypto.ts'
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? ''
 const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY') ?? ''
@@ -12,10 +13,15 @@ const adminAuth = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE)
 
 const DAILY_LIMIT = 350
 
+const APP_URL = Deno.env.get('APP_URL') ?? '*'
+
 const cors = {
-  'Access-Control-Allow-Origin': '*',
+  // CORS lockdown: only allow requests from the deployed app origin
+  // (falls back to * if APP_URL is unset, e.g. local dev).
+  'Access-Control-Allow-Origin': APP_URL,
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Vary': 'Origin',
 }
 
 const json = (body: unknown, status = 200) =>
@@ -43,13 +49,29 @@ Deno.serve(async (req) => {
     // Use service-role client for the profile read — bypasses RLS but we've
     // already verified the user identity above and only read THEIR row.
     const { data: profile } = await adminAuth
-      .from('profiles').select('claude_api_key, subscription_status').eq('id', user.id).single()
+      .from('profiles')
+      .select('claude_api_key, claude_api_key_encrypted, subscription_status')
+      .eq('id', user.id)
+      .single()
 
-    if (!profile?.claude_api_key) return json({ error: 'No Claude API key set in profile' }, 400)
-
-    if (profile.subscription_status !== 'active' && profile.subscription_status !== 'trialing') {
+    if (profile?.subscription_status !== 'active' && profile?.subscription_status !== 'trialing') {
       return json({ error: 'Subscription required' }, 402)
     }
+
+    // Resolve the actual API key: prefer the encrypted column (new path),
+    // fall back to the legacy plaintext column for users who haven't yet
+    // re-saved their key after the encryption migration.
+    let apiKey = ''
+    if (profile?.claude_api_key_encrypted) {
+      try {
+        apiKey = await decryptSecret(profile.claude_api_key_encrypted)
+      } catch (e) {
+        return json({ error: `Could not decrypt stored key — please re-save it in Profile. (${e.message})` }, 500)
+      }
+    } else if (profile?.claude_api_key) {
+      apiKey = profile.claude_api_key
+    }
+    if (!apiKey) return json({ error: 'No Claude API key set in profile' }, 400)
 
     // Reuse the service-role client for usage tracking
     const admin = adminAuth
@@ -74,7 +96,7 @@ Deno.serve(async (req) => {
     const anthropicRes = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
-        'x-api-key': profile.claude_api_key,
+        'x-api-key': apiKey,
         'anthropic-version': '2023-06-01',
         'anthropic-beta': 'prompt-caching-2024-07-31',
         'content-type': 'application/json',

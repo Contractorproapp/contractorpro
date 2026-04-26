@@ -10,9 +10,10 @@ const APP_URL               = Deno.env.get('APP_URL') || 'https://contractorpro-
 const admin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE)
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin':  '*',
+  'Access-Control-Allow-Origin':  APP_URL,
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Vary': 'Origin',
 }
 
 const json = (body: unknown, status = 200) =>

@@ -144,12 +144,18 @@ export default function Profile() {
   const [saved, setSaved]               = useState(false)
   const [error, setError]               = useState('')
 
+  // Whether the user has a key on file (encrypted or legacy plaintext).
+  // We never display the actual key — encrypted keys can't be read client-side
+  // by design, and showing legacy plaintext defeats the encryption migration.
+  const hasKey = !!(profile?.claude_api_key_encrypted || profile?.claude_api_key)
+
   useEffect(() => {
     if (profile) {
       setBusinessName(profile.business_name || '')
       setPhone(profile.phone || '')
       setReviewUrl(profile.google_review_url || '')
-      setApiKey(profile.claude_api_key || '')
+      // API key field stays empty on load — user types a new key to replace.
+      setApiKey('')
       setLogoPreview(profile.logo_url || null)
     }
   }, [profile])
@@ -174,16 +180,26 @@ export default function Profile() {
       logoUrl = data.publicUrl
     }
 
+    // Save the non-secret fields directly (RLS-protected)
     const { error: dbErr } = await supabase.from('profiles').upsert({
       id: user.id,
       business_name: businessName.trim(),
       phone: phone.trim(),
       google_review_url: reviewUrl.trim(),
-      claude_api_key: apiKey.trim(),
       ...(logoUrl && { logo_url: logoUrl }),
     })
-
     if (dbErr) { setError(dbErr.message); setSaving(false); return }
+
+    // The API key goes through a dedicated Edge Function that encrypts it
+    // server-side with AES-GCM-256 before persisting. The plaintext key
+    // never lands in the database.
+    if (apiKey.trim()) {
+      const { error: keyErr } = await supabase.functions.invoke('save-api-key', {
+        body: { api_key: apiKey.trim() },
+      })
+      if (keyErr) { setError(`Couldn't save API key: ${keyErr.message}`); setSaving(false); return }
+      setApiKey('')   // clear the input — never echo the key back
+    }
 
     await refreshProfile()
     setSaving(false)
@@ -252,15 +268,27 @@ export default function Profile() {
               console.anthropic.com <ExternalLink size={10} />
             </a>
           </p>
+
+          {hasKey && (
+            <div className="mb-2 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-semibold tracking-tight bg-green-100 text-green-700 dark:bg-green-500/15 dark:text-green-400">
+              <CheckCircle2 size={12} /> Key configured
+              {profile?.claude_api_key && !profile?.claude_api_key_encrypted && (
+                <span className="text-yellow-700 dark:text-yellow-400 ml-1">· legacy plaintext, save again to encrypt</span>
+              )}
+            </div>
+          )}
+
           <div className="relative">
             <input
               className="input pr-10 font-mono"
               type={showKey ? 'text' : 'password'}
-              placeholder="sk-ant-api03-…"
+              placeholder={hasKey ? 'Paste a new key to replace…' : 'sk-ant-api03-…'}
               value={apiKey}
               onChange={e => setApiKey(e.target.value)}
+              autoComplete="off"
             />
             <button
+              type="button"
               onClick={() => setShowKey(s => !s)}
               aria-label={showKey ? 'Hide key' : 'Show key'}
               className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
@@ -268,6 +296,9 @@ export default function Profile() {
               {showKey ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
           </div>
+          <p className="text-xs text-muted-foreground mt-1.5">
+            Encrypted at rest with AES-GCM-256. Once saved, the key can't be read back — only used server-side.
+          </p>
         </div>
 
         {error && (

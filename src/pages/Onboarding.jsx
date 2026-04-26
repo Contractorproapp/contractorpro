@@ -50,13 +50,21 @@ export default function Onboarding() {
       id: user.id,
       business_name: businessName.trim(),
       phone: phone.trim(),
-      claude_api_key: apiKey.trim(),
       onboarding_complete: true,
       ...(logoUrl && { logo_url: logoUrl }),
     }
 
     const { error: dbErr } = await supabase.from('profiles').upsert(updates)
     if (dbErr) { setError(dbErr.message); setSaving(false); return }
+
+    // The API key is stored encrypted via the dedicated Edge Function.
+    if (apiKey.trim()) {
+      const { error: keyErr } = await supabase.functions.invoke('save-api-key', {
+        body: { api_key: apiKey.trim() },
+      })
+      // Non-fatal — user can save it later in Profile.
+      if (keyErr) console.warn('Could not save API key during onboarding:', keyErr.message)
+    }
 
     await refreshProfile()
     navigate('/subscribe')
