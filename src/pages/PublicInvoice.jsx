@@ -20,21 +20,19 @@ export default function PublicInvoice() {
 
   useEffect(() => {
     const load = async () => {
-      const { data: inv } = await supabase
-        .from('invoices')
-        .select('*')
-        .eq('public_token', token)
-        .single()
+      // Use RPC instead of direct select — the over-permissive
+      // "public read" RLS policy was retired (it was leaking the
+      // whole invoices table). The RPC enforces "exactly one row by
+      // token" server-side.
+      const { data: inv } = await supabase.rpc('get_public_invoice', { token_param: token })
 
       if (!inv) { setNotFound(true); setLoading(false); return }
       setInvoice(inv)
 
-      const { data: prof } = await supabase
-        .from('profiles')
-        .select('business_name, phone, email, logo_url')
-        .eq('id', inv.user_id)
-        .single()
-      setProfile(prof)
+      // Limited public profile read via RPC — direct .from('profiles')
+      // is blocked by RLS for anon users.
+      const { data: profRows } = await supabase.rpc('get_public_profile', { uid: inv.user_id })
+      setProfile(Array.isArray(profRows) ? profRows[0] : profRows)
       setLoading(false)
     }
     load()

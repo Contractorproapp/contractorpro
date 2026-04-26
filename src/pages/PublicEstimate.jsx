@@ -16,14 +16,11 @@ export default function PublicEstimate() {
 
   useEffect(() => {
     const load = async () => {
-      const { data } = await supabase.from('estimates').select('*').eq('public_token', token).single()
+      const { data } = await supabase.rpc('get_public_estimate', { token_param: token })
       if (!data) { setNotFound(true); setLoading(false); return }
       setEst(data)
-      const { data: prof } = await supabase
-        .from('profiles')
-        .select('business_name, phone, email, logo_url')
-        .eq('id', data.user_id).single()
-      setProfile(prof)
+      const { data: profRows } = await supabase.rpc('get_public_profile', { uid: data.user_id })
+      setProfile(Array.isArray(profRows) ? profRows[0] : profRows)
       setLoading(false)
     }
     load()
@@ -33,7 +30,7 @@ export default function PublicEstimate() {
     if (!signature) return
     setSigning(true)
     await supabase.rpc('sign_estimate', { token_param: token, signature_param: signature })
-    const { data } = await supabase.from('estimates').select('*').eq('public_token', token).single()
+    const { data } = await supabase.rpc('get_public_estimate', { token_param: token })
     setEst(data)
     setSigning(false)
   }

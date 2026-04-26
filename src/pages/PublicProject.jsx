@@ -21,21 +21,13 @@ export default function PublicProject() {
 
   useEffect(() => {
     const load = async () => {
-      const { data: proj } = await supabase
-        .from('projects')
-        .select('*')
-        .eq('public_token', token)
-        .single()
+      const { data: proj } = await supabase.rpc('get_public_project', { token_param: token })
 
       if (!proj) { setNotFound(true); setLoading(false); return }
       setProject(proj)
 
-      const { data: prof } = await supabase
-        .from('profiles')
-        .select('business_name, phone, email, logo_url')
-        .eq('id', proj.user_id)
-        .single()
-      setProfile(prof)
+      const { data: profRows } = await supabase.rpc('get_public_profile', { uid: proj.user_id })
+      setProfile(Array.isArray(profRows) ? profRows[0] : profRows)
       setLoading(false)
     }
     load()
