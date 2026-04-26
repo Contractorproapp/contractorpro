@@ -64,21 +64,43 @@ export default function KeyboardShortcuts() {
   ]
 
   return (
-    <div className="fixed inset-0 z-[70] bg-black/50 flex items-center justify-center p-4" onClick={() => setShowHelp(false)}>
-      <div className="bg-white rounded-xl max-w-sm w-full p-5" onClick={e => e.stopPropagation()}>
+    <div
+      className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+      onClick={() => setShowHelp(false)}
+    >
+      <div
+        className="card max-w-sm w-full p-5 shadow-2xl relative overflow-hidden"
+        onClick={e => e.stopPropagation()}
+      >
+        <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-brand-500 via-brand-400 to-brand-600" />
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-bold">Keyboard Shortcuts</h2>
-          <button onClick={() => setShowHelp(false)} className="text-gray-400 hover:text-gray-600"><X size={18} /></button>
+          <div>
+            <p className="stamp-label text-brand-600 dark:text-brand-400">// Hotkeys</p>
+            <h2 className="font-display font-bold text-lg text-foreground mt-0.5">Keyboard Shortcuts</h2>
+          </div>
+          <button
+            onClick={() => setShowHelp(false)}
+            aria-label="Close"
+            className="text-muted-foreground hover:text-foreground p-1.5 rounded-md hover:bg-accent transition-colors cursor-pointer"
+          >
+            <X size={18} />
+          </button>
         </div>
         <div className="space-y-1.5 text-sm">
           {items.map(([keys, label]) => (
             <div key={keys} className="flex items-center justify-between py-1">
-              <span className="text-gray-700">{label}</span>
-              <kbd className="px-2 py-0.5 bg-gray-100 border border-gray-300 rounded text-xs font-mono">{keys}</kbd>
+              <span className="text-foreground">{label}</span>
+              <kbd className="px-2 py-0.5 bg-muted border border-border rounded text-xs font-mono text-muted-foreground">
+                {keys}
+              </kbd>
             </div>
           ))}
         </div>
-        <p className="text-xs text-gray-400 mt-4">Tip: press <kbd className="px-1 bg-gray-100 rounded text-[10px]">g</kbd> then a letter within 1 second to navigate.</p>
+        <p className="text-xs text-muted-foreground mt-4">
+          Tip: press{' '}
+          <kbd className="px-1 bg-muted text-muted-foreground rounded text-[10px] font-mono">g</kbd>{' '}
+          then a letter within 1 second to navigate.
+        </p>
       </div>
     </div>
   )
