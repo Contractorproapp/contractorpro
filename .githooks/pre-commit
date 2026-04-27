@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+# ContractorPro pre-commit secret scanner
+# Blocks any commit that contains a real-looking secret in staged files.
+# Add a new pattern to PATTERNS below if you start using a new secret type.
+
+set -e
+
+# Newline-separated regex patterns. Anchor the prefixes so we don't match
+# placeholders like "sk-ant-api03-…" or env-var name references.
+PATTERNS=(
+  'sk-ant-api03-[A-Za-z0-9_-]{20,}'         # Anthropic live key
+  'sk_live_[A-Za-z0-9]{20,}'                # Stripe live secret key
+  'sk_test_[A-Za-z0-9]{20,}'                # Stripe test secret key
+  'rk_live_[A-Za-z0-9]{20,}'                # Stripe restricted live key
+  'whsec_[A-Za-z0-9]{20,}'                  # Stripe webhook signing secret
+  're_[A-Za-z0-9]{20,}'                     # Resend API key
+  'eyJhbGciOi[A-Za-z0-9._-]{40,}'           # JWT (incl. service-role keys)
+  'AKIA[0-9A-Z]{16}'                        # AWS access key
+  'ghp_[A-Za-z0-9]{36}'                     # GitHub personal access token
+  'glpat-[A-Za-z0-9_-]{20}'                 # GitLab PAT
+  '-----BEGIN [A-Z ]*PRIVATE KEY-----'      # Any private key block
+)
+
+STAGED=$(git diff --cached --name-only --diff-filter=ACM)
+if [ -z "$STAGED" ]; then
+  exit 0
+fi
+
+LEAKS=""
+for file in $STAGED; do
+  # Skip binaries, lockfiles, the example env, and this hook itself.
+  case "$file" in
+    *.lock|*.lockb|*.png|*.jpg|*.jpeg|*.gif|*.pdf|*.ico|*.woff*|*.ttf|*.zip|*.tar|*.gz)
+      continue ;;
+    .env.example|package-lock.json|.githooks/pre-commit)
+      continue ;;
+  esac
+  [ -f "$file" ] || continue
+
+  for pat in "${PATTERNS[@]}"; do
+    match=$(git diff --cached --no-color "$file" | grep -nE "^\+.*$pat" || true)
+    if [ -n "$match" ]; then
+      LEAKS="${LEAKS}\n[$file]\n$match\n"
+    fi
+  done
+done
+
+if [ -n "$LEAKS" ]; then
+  echo ""
+  echo "❌ COMMIT BLOCKED — possible secret detected in staged changes:"
+  echo -e "$LEAKS"
+  echo ""
+  echo "If this is a false positive, commit with:  git commit --no-verify"
+  echo "(but PLEASE double-check first — leaked secrets can never be unleaked.)"
+  exit 1
+fi
+
+exit 0
