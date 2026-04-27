@@ -13,10 +13,14 @@ const RESEND_FROM_EMAIL = Deno.env.get('RESEND_FROM_EMAIL') ?? ''
 
 const DAILY_LIMIT = 50
 
+const APP_URL = Deno.env.get('APP_URL') ?? '*'
+
 const cors = {
-  'Access-Control-Allow-Origin': '*',
+  // Locked to deployed app origin (matches the other functions)
+  'Access-Control-Allow-Origin': APP_URL,
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Vary': 'Origin',
 }
 
 const json = (body: unknown, status = 200) =>
