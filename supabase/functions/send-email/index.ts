@@ -33,11 +33,26 @@ function escapeHtml(s: string) {
   return (s || '').replace(/[&<>"']/g, (c) => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]!))
 }
 
+// CAN-SPAM compliance footer.
+// CONTRACTOR_PRO_ADDRESS = your physical mailing address. Must be a real
+// postal address (PO Box is acceptable). Override at deploy time by
+// setting the COMPANY_ADDRESS env var on the Edge Function.
+const COMPANY_ADDRESS = Deno.env.get('COMPANY_ADDRESS') || '[YOUR BUSINESS MAILING ADDRESS]'
+
 function buildHtml(body: string, businessName?: string) {
   const lines = escapeHtml(body).split('\n').map(l => l || '&nbsp;').join('<br/>')
+  // The CAN-SPAM Act (and most equivalent laws) require every commercial
+  // email to include a valid physical postal address of the sender.
+  // Even though these are transactional one-to-one messages, the safe
+  // default is to include it on every send.
   return `<!doctype html><html><body style="font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;color:#111827;line-height:1.55;max-width:560px;margin:24px auto;padding:0 16px">
     <div style="font-size:15px">${lines}</div>
-    ${businessName ? `<hr style="border:none;border-top:1px solid #E5E7EB;margin:28px 0"/><p style="font-size:12px;color:#6B7280">Sent via ContractorPro on behalf of ${escapeHtml(businessName)}</p>` : ''}
+    <hr style="border:none;border-top:1px solid #E5E7EB;margin:28px 0"/>
+    <p style="font-size:12px;color:#6B7280;line-height:1.5">
+      ${businessName ? `Sent via ContractorPro on behalf of ${escapeHtml(businessName)}.<br/>` : ''}
+      ContractorPro · ${escapeHtml(COMPANY_ADDRESS)}<br/>
+      You're receiving this because ${businessName ? escapeHtml(businessName) : 'a ContractorPro user'} sent it to you directly. Reply to this email to contact them.
+    </p>
   </body></html>`
 }
 
