@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom'
 
 const CONTACT_EMAIL = 'Contractorproapp@proton.me'
-// Replace with your actual business mailing address before launching to public users.
-// Required for CAN-SPAM if you ever send marketing emails, and good practice in any case.
-const COMPANY_ADDRESS = '[YOUR BUSINESS MAILING ADDRESS]'
+// When you have a real mailing address (PO Box, virtual mailbox, registered
+// business address), set it here AND set COMPANY_ADDRESS as a Supabase
+// Edge Function secret so the send-email footer picks it up too. Required
+// before activating Resend transactional sending (CAN-SPAM Act).
+const COMPANY_ADDRESS = ''
 
 export default function Privacy() {
   return (
@@ -143,7 +145,7 @@ export default function Privacy() {
           <p>Questions or requests:</p>
           <ul className="list-disc pl-5 space-y-1">
             <li>Email: <a href={`mailto:${CONTACT_EMAIL}`} className="text-brand-600 dark:text-brand-400 font-semibold hover:underline">{CONTACT_EMAIL}</a></li>
-            <li>Mailing address: {COMPANY_ADDRESS}</li>
+            {COMPANY_ADDRESS && <li>Mailing address: {COMPANY_ADDRESS}</li>}
           </ul>
         </section>
       </div>
