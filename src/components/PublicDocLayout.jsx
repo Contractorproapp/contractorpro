@@ -43,7 +43,7 @@ export default function PublicDocLayout({
             ) : (
               <img
                 src="/hammer.svg"
-                alt="ContractorPro"
+                alt="Subfirm"
                 className="w-11 h-11 rounded-md ring-1 ring-black/30 print:ring-steel-300"
               />
             )}
@@ -89,7 +89,7 @@ export default function PublicDocLayout({
       <footer className="relative max-w-3xl mx-auto px-4 sm:px-6 pb-6 print:pb-2">
         <div className="flex items-center justify-center gap-1.5 text-[10px] uppercase tracking-stamp text-steel-500">
           <img src="/hammer.svg" alt="" aria-hidden className="w-4 h-4 rounded-sm opacity-60" />
-          Powered by ContractorPro
+          Powered by Subfirm
         </div>
       </footer>
 

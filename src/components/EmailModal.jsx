@@ -95,7 +95,7 @@ export default function EmailModal({ open, onClose, initialTo = '', initialSubje
                 />
               </div>
               <p className="text-xs text-muted-foreground">
-                Sent from your business name via ContractorPro. Replies go straight to your inbox.
+                Sent from your business name via Subfirm. Replies go straight to your inbox.
               </p>
             </div>
 

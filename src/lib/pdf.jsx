@@ -263,11 +263,11 @@ export function TaxReportPDF({ year, profile, expenses, mileage, mileageRate = 0
         <View style={{ ...styles.notes, backgroundColor: '#FFFBEB', borderLeftWidth: 3, borderLeftColor: '#F59E0B', borderRadius: 2 }}>
           <Text style={{ fontSize: 9, fontWeight: 'bold', marginBottom: 4 }}>Important</Text>
           <Text style={styles.pre}>
-            This report summarizes records you entered into ContractorPro. It is not tax advice and does not account for home office, Section 179, depreciation, or other deductions. Bring it to a CPA along with original receipts. IRS standard mileage rate shown is ${mileageRate.toFixed(2)}/mi — verify current year's rate.
+            This report summarizes records you entered into Subfirm. It is not tax advice and does not account for home office, Section 179, depreciation, or other deductions. Bring it to a CPA along with original receipts. IRS standard mileage rate shown is ${mileageRate.toFixed(2)}/mi — verify current year's rate.
           </Text>
         </View>
 
-        <Text style={styles.footer} fixed>{profile?.business_name || 'ContractorPro'} — {year} Tax Report</Text>
+        <Text style={styles.footer} fixed>{profile?.business_name || 'Subfirm'} — {year} Tax Report</Text>
       </Page>
 
       <Page size="LETTER" style={styles.page}>
@@ -311,7 +311,7 @@ export function TaxReportPDF({ year, profile, expenses, mileage, mileageRate = 0
           </>
         )}
 
-        <Text style={styles.footer} fixed>{profile?.business_name || 'ContractorPro'} — {year} Tax Report</Text>
+        <Text style={styles.footer} fixed>{profile?.business_name || 'Subfirm'} — {year} Tax Report</Text>
       </Page>
     </Document>
   )

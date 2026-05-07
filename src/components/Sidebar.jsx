@@ -80,13 +80,13 @@ function LogoBlock({ profile }) {
       ) : (
         <img
           src="/hammer.svg"
-          alt="ContractorPro"
+          alt="Subfirm"
           className="w-9 h-9 rounded-md ring-1 ring-black/20"
         />
       )}
       <div className="min-w-0">
         <div className="font-display font-bold text-sm leading-tight truncate text-white">
-          {profile?.business_name || 'ContractorPro'}
+          {profile?.business_name || 'Subfirm'}
         </div>
         <div className="text-[10px] uppercase tracking-stamp text-steel-400 mt-0.5">
           Field Ops
@@ -193,10 +193,10 @@ export default function Sidebar() {
           {profile?.logo_url ? (
             <img src={profile.logo_url} alt="Logo" className="w-8 h-8 rounded-md object-cover ring-1 ring-steel-700" />
           ) : (
-            <img src="/hammer.svg" alt="ContractorPro" className="w-8 h-8 rounded-md ring-1 ring-black/20" />
+            <img src="/hammer.svg" alt="Subfirm" className="w-8 h-8 rounded-md ring-1 ring-black/20" />
           )}
           <span className="font-display font-bold text-sm truncate max-w-[160px]">
-            {profile?.business_name || 'ContractorPro'}
+            {profile?.business_name || 'Subfirm'}
           </span>
         </div>
         <div className="flex items-center gap-1.5">

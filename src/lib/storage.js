@@ -1,4 +1,4 @@
-const PREFIX = 'contractorpro_'
+const PREFIX = 'subfirm_'
 
 export const storage = {
   get(key, fallback = null) {

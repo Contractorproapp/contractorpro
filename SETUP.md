@@ -1,4 +1,4 @@
-# ContractorPro — Deploy Guide
+# Subfirm — Deploy Guide
 
 Follow these steps in order. Total time: ~45 minutes.
 
@@ -26,7 +26,7 @@ Follow these steps in order. Total time: ~45 minutes.
 
 1. Go to [stripe.com](https://stripe.com) → create account
 2. **Products → Add Product**:
-   - Name: `ContractorPro`
+   - Name: `Subfirm`
    - Price: `$29.00` / month (recurring)
    - Copy the **Price ID** (starts with `price_`) → `VITE_STRIPE_PRICE_ID`
 3. **Developers → API Keys** → copy **Publishable key** → `VITE_STRIPE_PUBLISHABLE_KEY`

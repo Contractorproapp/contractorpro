@@ -19,7 +19,7 @@ export default function Privacy() {
       <div className="prose prose-sm max-w-none space-y-6">
         <section>
           <h2 className="text-xl font-semibold mb-2">1. Who we are</h2>
-          <p>ContractorPro ("we", "us") provides software for contractors to manage estimates, leads, invoices, projects, and marketing content. This policy explains what data we collect, how we use it, and the rights you have over it.</p>
+          <p>Subfirm ("we", "us") provides software for contractors to manage estimates, leads, invoices, projects, and marketing content. This policy explains what data we collect, how we use it, and the rights you have over it.</p>
         </section>
 
         <section>
@@ -66,7 +66,7 @@ export default function Privacy() {
             <li><strong>Resend</strong> — transactional email delivery (only when enabled).</li>
             <li><strong>Google Fonts</strong> — serves typefaces. Google may receive your IP address as part of this request.</li>
           </ul>
-          <p>Your business data (estimates, invoices, leads, projects) is isolated per-account via row-level security. Other ContractorPro users cannot access your data.</p>
+          <p>Your business data (estimates, invoices, leads, projects) is isolated per-account via row-level security. Other Subfirm users cannot access your data.</p>
         </section>
 
         <section>

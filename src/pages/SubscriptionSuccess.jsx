@@ -68,7 +68,7 @@ export default function SubscriptionSuccess() {
             </div>
             <h2 className="font-display font-bold text-2xl text-foreground">You're all set!</h2>
             <p className="text-sm text-muted-foreground">
-              Welcome to ContractorPro. Taking you to the dashboard…
+              Welcome to Subfirm. Taking you to the dashboard…
             </p>
           </>
         )}

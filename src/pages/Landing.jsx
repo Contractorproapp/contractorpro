@@ -34,8 +34,8 @@ export default function Landing() {
       {/* ---------- Nav ---------- */}
       <nav className="max-w-6xl mx-auto px-4 sm:px-6 py-5 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <img src="/hammer.svg" alt="ContractorPro" className="w-9 h-9 rounded-md ring-1 ring-black/10 dark:ring-white/10" />
-          <span className="font-display font-bold text-lg tracking-tight">ContractorPro</span>
+          <img src="/hammer.svg" alt="Subfirm" className="w-9 h-9 rounded-md ring-1 ring-black/10 dark:ring-white/10" />
+          <span className="font-display font-bold text-lg tracking-tight">Subfirm</span>
         </div>
         <div className="flex items-center gap-2 sm:gap-3">
           <Link to="/login" className="text-sm font-semibold text-muted-foreground hover:text-foreground px-3 py-2 transition-colors">
@@ -81,7 +81,7 @@ export default function Landing() {
             <span className="text-brand-600 dark:text-brand-400">More time on the job.</span>
           </h1>
           <p className="text-base sm:text-lg text-muted-foreground mt-6 max-w-2xl mx-auto leading-relaxed">
-            ContractorPro writes your estimates, invoices, follow-ups, and marketing — so you can focus on the work that actually pays.
+            Subfirm writes your estimates, invoices, follow-ups, and marketing — so you can focus on the work that actually pays.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-8">
             <Link to="/signup" className="btn-primary text-base px-6 py-3">
@@ -203,14 +203,14 @@ export default function Landing() {
       <footer className="py-10 border-t border-border text-center text-sm text-muted-foreground">
         <div className="flex justify-center items-center gap-1.5 mb-3">
           <img src="/hammer.svg" alt="" aria-hidden className="w-5 h-5 rounded-sm opacity-70" />
-          <span className="font-display font-semibold text-foreground">ContractorPro</span>
+          <span className="font-display font-semibold text-foreground">Subfirm</span>
         </div>
         <div className="flex justify-center gap-6 mb-3">
           <Link to="/privacy" className="hover:text-foreground transition-colors">Privacy</Link>
           <Link to="/terms"   className="hover:text-foreground transition-colors">Terms</Link>
           <a href="mailto:Contractorproapp@proton.me" className="hover:text-foreground transition-colors">Contact</a>
         </div>
-        <p className="stamp-label">© {new Date().getFullYear()} ContractorPro · Made for the trades</p>
+        <p className="stamp-label">© {new Date().getFullYear()} Subfirm · Made for the trades</p>
       </footer>
     </div>
   )

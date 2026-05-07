@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom'
 const GOVERNING_STATE = '[YOUR STATE]'           // e.g. 'California'
 const GOVERNING_COUNTY = '[YOUR COUNTY]'         // e.g. 'San Francisco County'
 const ARBITRATION_BODY = 'JAMS'                  // or 'AAA' (American Arbitration Association)
-const COMPANY_LEGAL_NAME = 'ContractorPro'       // change if you incorporate as something else
+const COMPANY_LEGAL_NAME = 'Subfirm'       // change if you incorporate as something else
 const CONTACT_EMAIL = 'Contractorproapp@proton.me'
 
 export default function Terms() {

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# ContractorPro pre-commit secret scanner
+# Subfirm pre-commit secret scanner
 # Blocks any commit that contains a real-looking secret in staged files.
 # Add a new pattern to PATTERNS below if you start using a new secret type.
 

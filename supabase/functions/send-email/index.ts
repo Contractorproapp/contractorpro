@@ -49,9 +49,9 @@ function buildHtml(body: string, businessName?: string) {
     <div style="font-size:15px">${lines}</div>
     <hr style="border:none;border-top:1px solid #E5E7EB;margin:28px 0"/>
     <p style="font-size:12px;color:#6B7280;line-height:1.5">
-      ${businessName ? `Sent via ContractorPro on behalf of ${escapeHtml(businessName)}.<br/>` : ''}
-      ${COMPANY_ADDRESS ? `ContractorPro · ${escapeHtml(COMPANY_ADDRESS)}<br/>` : ''}
-      You're receiving this because ${businessName ? escapeHtml(businessName) : 'a ContractorPro user'} sent it to you directly. Reply to this email to contact them.
+      ${businessName ? `Sent via Subfirm on behalf of ${escapeHtml(businessName)}.<br/>` : ''}
+      ${COMPANY_ADDRESS ? `Subfirm · ${escapeHtml(COMPANY_ADDRESS)}<br/>` : ''}
+      You're receiving this because ${businessName ? escapeHtml(businessName) : 'a Subfirm user'} sent it to you directly. Reply to this email to contact them.
     </p>
   </body></html>`
 }
@@ -105,7 +105,7 @@ Deno.serve(async (req) => {
     const { to, subject, body, kind } = await req.json()
     if (!to || !subject || !body) return json({ error: 'Missing to/subject/body' }, 400)
 
-    const fromName = profile?.business_name || 'ContractorPro'
+    const fromName = profile?.business_name || 'Subfirm'
     const from = `${fromName} <${RESEND_FROM_EMAIL}>`
     const replyTo = user.email || undefined
 

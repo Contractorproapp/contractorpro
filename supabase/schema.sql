@@ -1,5 +1,5 @@
 -- ============================================================
--- ContractorPro — Supabase Schema (idempotent — safe to re-run)
+-- Subfirm — Supabase Schema (idempotent — safe to re-run)
 -- ============================================================
 
 create extension if not exists pgcrypto;

@@ -327,7 +327,7 @@ export default function Profile() {
           <div>
             <p className="text-sm text-foreground">
               <span className="text-muted-foreground">Plan:</span>{' '}
-              <span className="font-display font-semibold">ContractorPro — $29/mo</span>
+              <span className="font-display font-semibold">Subfirm — $29/mo</span>
             </p>
             <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1.5">
               Status:

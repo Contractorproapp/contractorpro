@@ -9,8 +9,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['hammer.svg'],
       manifest: {
-        name: 'ContractorPro',
-        short_name: 'ContractorPro',
+        name: 'Subfirm',
+        short_name: 'Subfirm',
         description: 'Your contracting business, handled. Estimates, invoices, clients, and more.',
         theme_color: '#F97316',
         background_color: '#FAFAF7',

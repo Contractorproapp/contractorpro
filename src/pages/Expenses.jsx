@@ -165,7 +165,7 @@ export default function Expenses() {
 
   const downloadTaxPdf = () => downloadPdf(
     <TaxReportPDF year={year} profile={profile} expenses={yearExpenses} mileage={yearMileage} mileageRate={IRS_MILEAGE_RATE} />,
-    `${profile?.business_name || 'ContractorPro'}-${year}-Tax-Report.pdf`
+    `${profile?.business_name || 'Subfirm'}-${year}-Tax-Report.pdf`
   )
 
   if (loading) return (

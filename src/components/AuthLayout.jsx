@@ -44,11 +44,11 @@ export default function AuthLayout({
           <Link to="/" className="flex items-center gap-2.5 group">
             <img
               src="/hammer.svg"
-              alt="ContractorPro"
+              alt="Subfirm"
               className="w-9 h-9 rounded-md ring-1 ring-black/30 transition-transform group-hover:rotate-[-6deg]"
             />
             <span className="font-display font-bold text-base tracking-tight">
-              ContractorPro
+              Subfirm
             </span>
           </Link>
         </div>
